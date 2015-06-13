@@ -1,0 +1,55 @@
+What does Structure.io do? 
+It gives the privilege of structure to everybody.
+
+Here are some features of structure.io :
+
+1. Automatic Agenda Generation
+
+  What does this even mean?
+  Something like this:
+
+    Hey Vinay, here's how your day looks like:
+      1 hour on A
+      2 hours on B
+      3 hours on C
+      1 hour on D
+
+    Suggested schedule:
+      2-4 PM: Do this
+      5-6 PM: Do that
+
+    Keep in mind that the actual times can be rearranged, to
+    make it more flexible.
+
+    Logging has a 'task' option which adds a log as a task.
+    This is the only way to check off a task.
+    So log and log often.
+
+    All Goals have a 'Amount of Hours' field and a date
+    to be accomplished by.
+
+    Goals have a hierarchy too -- Basically to-dos
+    full fledge to become goals.
+
+    To check off a goal/task, you need to log it.
+
+    Logging however can be done for other things as well.
+    Just think of it as another parameter of hash.
+
+    A day constitutes 24 hours and it has to be done by that
+    time spot.
+
+    Repetition needs to be added for certain tasks/to-dos/goals
+
+2. Let's talk input:
+-- Add new task/goal/creating subtrees
+-- Logging obviously
+
+3. As now recorded in my notebook:
+
+4 panels.
+  1: Displaying of scheduling of tasks/goals
+  2: Adding tasks/goals
+  3: Logging
+  4: Thoughts and ideas
+
