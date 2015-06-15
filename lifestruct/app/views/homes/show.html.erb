@@ -1,1 +1,4 @@
-<h1> <%= @a %> </h1>
+<h2><%= @a %> </h2>
+<% @dates.each do |date| %>
+  <h3> <%= date.to_s.split('-').reverse.join(' ') %> </h3>
+<% end %>
