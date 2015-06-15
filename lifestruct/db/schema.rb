@@ -11,13 +11,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150613092753) do
+ActiveRecord::Schema.define(version: 20150615053243) do
 
   create_table "goals", force: true do |t|
     t.string   "title"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.text     "description"
+    t.integer  "parent_id"
+    t.float    "progress"
+    t.float    "timetaken"
+    t.datetime "deadline"
   end
+
+  add_index "goals", ["parent_id"], name: "index_goals_on_parent_id", using: :btree
 
 end

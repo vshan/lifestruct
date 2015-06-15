@@ -1,6 +1,6 @@
 class HomesController < ApplicationController
   def show
-    @a = "Yo man wassup"
+    @a = "Testing Test"
     @dates = next_seven_days(Date.new(2015,6,30))
   end
 
