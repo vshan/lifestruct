@@ -1,7 +1,32 @@
 <h1><%= @a %> </h1>
 <% @dates.each do |date| %>
   <h2> <%= date.to_s.split('-').reverse.join(' ') %> </h2>
-  <h3> Goal: Transforming</h3>
-  <p> <strong> Description: </strong> We have to do it like this </p>
-  <p> <strong> Tasks: </strong> 1. 2. 3. </p>
 <% end %>
+
+<h1> Goals </h1>
+  <h2> Make a new task: </h2>
+  <%= form_for :goal do |f| %>
+    <p>
+      <%= f.label :title %><br>
+      <%= f.text_field :title %>
+    </p>
+ 
+    <p>
+      <%= f.label :description %><br>
+      <%= f.text_area :description %>
+    </p>
+ 
+    <p> 
+      <%= f.label :deadline %>
+      <%= f.datetime_field :deadline %>
+    </p> 
+    <p>
+      <%= f.submit %>
+    </p>
+  <% end %>
+  <h2> All goals: </h2>
+  <% @goals.each do |goal| %>
+    <h3> Goal: <%= goal.title %> </h3>
+    <p> <strong> Description: </strong> <%= goal.description %> </p>
+    <p> <%= goal.deadline %> </p>
+  <% end %>

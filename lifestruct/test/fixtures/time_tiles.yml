@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  start: 2015-06-15 13:18:17
+  end: 2015-06-15 13:18:17
+  status: 1
+  goal_id: 1
+  day: 2015-06-15
+
+two:
+  start: 2015-06-15 13:18:17
+  end: 2015-06-15 13:18:17
+  status: 1
+  goal_id: 1
+  day: 2015-06-15

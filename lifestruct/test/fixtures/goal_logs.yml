@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  title: MyString
+  description: MyText
+  goal_id: 1
+  start: 2015-06-15 13:16:10
+  end: 2015-06-15 13:16:10
+  category: MyText
+
+two:
+  title: MyString
+  description: MyText
+  goal_id: 1
+  start: 2015-06-15 13:16:10
+  end: 2015-06-15 13:16:10
+  category: MyText
