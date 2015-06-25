@@ -3,6 +3,10 @@ class HomesController < ApplicationController
     @a = "Testing Test"
     @dates = next_seven_days(Date.today)
     @goals = Goal.all
+    respond_to do |format|
+      format.html
+      format.js
+    end
   end
 
   def create

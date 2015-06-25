@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150615074817) do
+ActiveRecord::Schema.define(version: 20150617045708) do
 
   create_table "goal_logs", force: true do |t|
     t.string   "title"
@@ -33,19 +33,10 @@ ActiveRecord::Schema.define(version: 20150615074817) do
     t.float    "progress"
     t.float    "timetaken"
     t.datetime "deadline"
+    t.integer  "repeatable"
   end
 
   add_index "goals", ["parent_id"], name: "index_goals_on_parent_id", using: :btree
-
-  create_table "time_boards", force: true do |t|
-    t.time     "start"
-    t.time     "end"
-    t.integer  "status"
-    t.integer  "goal_id"
-    t.date     "day"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
 
   create_table "time_tiles", force: true do |t|
     t.time     "start"
