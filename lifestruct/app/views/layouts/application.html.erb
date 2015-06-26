@@ -16,10 +16,10 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </a>
-        <a class="brand" href="#">Life Struct</a>
+        <a class="brand" href="/home">Life Struct</a>
         <div class="nav-collapse">
           <ul class="nav">
-            <li><%= link_to "Browse Goals" %></li>
+            <li><%= link_to "Browse Goals", goals_path %></li>
             <li><%= link_to "Completed" %></li>
             <li><%= link_to "Contact Us" %></li>
             <li><%= link_to "Create" %></li>
@@ -29,7 +29,7 @@
     </div>
   </div>
   <div class="container">
-    <div id="calendar"></div>
-    <div id="rest_of_body"> <%= yield %> </div>
+    <%= yield %> 
+  </div>
 </body>
 </html>

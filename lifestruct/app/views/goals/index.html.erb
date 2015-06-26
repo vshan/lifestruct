@@ -1,0 +1,51 @@
+<script>
+$( document ).ready(function() {
+  $('.add-goal-button').on('click', function(event) {
+    var btnid = $(this).attr('id');
+    var parent_id = btnid.split("-")[1];
+    $('#goal_parent_id').attr('value', parent_id);
+    console.log(parent_id);
+  });
+});
+</script>
+
+<% if @goals.size > 0 %>
+  <h2> All Goals </h2>
+  <ul class="goals">
+    <% @goals.each do |goal| %>
+      <li id="goal-id-<%= goal.id %>">
+        <div class="goal">
+          <p> <strong>Goal:</strong> <%= goal.title %> </p>
+          <p> <strong>Description:</strong> <%= goal.description %> </p>
+          <p> <strong>Deadline:</strong> <%= goal.deadline %> </p>
+          <button type="button" class="btn btn-primary btn-lg add-goal-button" data-toggle="modal" data-target="#myModal" id="parent-<%= goal.id %>">
+            New Sub Goal
+          </button>
+        </div>
+      </li>
+    <% end %>
+  </ul>
+<% end %>
+
+<!-- Button trigger modal -->
+
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Make a New Goal</h4>
+      </div>
+      <div class="modal-body">
+        <%= render 'homes/form' %>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+  

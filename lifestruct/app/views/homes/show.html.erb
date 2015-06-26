@@ -1,18 +1,6 @@
-
+<div id="calendar"></div>
 
 <div id="interactionContainer"></div>
-
-
-<%= link_to "New Goal", {controller: "homes", action: "show"}, class: "btn btn-primary btn-lg", remote: true %>
-
-<% if @goals.size > 0 %>
-  <h2> All Goals: </h2>
-  <% @goals.each do |goal| %>
-    <h3> <strong>Goal:</strong> <%= goal.title %> </h3>
-    <h3> <strong>Description:</strong> <%= goal.description %> </h3>
-  <% end %>
-<% end %>
-
 
 <!-- Button trigger modal -->
 <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
