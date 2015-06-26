@@ -13,19 +13,36 @@ $( document ).ready(function() {
   <h2> All Goals </h2>
   <ul class="goals">
     <% @goals.each do |goal| %>
-      <li id="goal-id-<%= goal.id %>">
-        <div class="goal">
-          <p> <strong>Goal:</strong> <%= goal.title %> </p>
-          <p> <strong>Description:</strong> <%= goal.description %> </p>
-          <p> <strong>Deadline:</strong> <%= goal.deadline %> </p>
-          <button type="button" class="btn btn-primary btn-lg add-goal-button" data-toggle="modal" data-target="#myModal" id="parent-<%= goal.id %>">
-            New Sub Goal
-          </button>
+     <% if goal.subgoals.length > 0 || goal.parent.nil? %>
+       <li id="goal-id-<%= goal.id %>">
+         <div class="goal">
+           <p> <strong>Goal:</strong> <%= goal.title %> </p>
+           <p> <strong>Description:</strong> <%= goal.description %> </p>
+           <p> <strong>Deadline:</strong> <%= goal.deadline %> </p>
+           <button type="button" class="btn btn-primary btn-xs add-goal-button" data-toggle="modal" data-target="#myModal" id="parent-<%= goal.id %>">
+             New Sub Goal
+           </button>
+           <ul>
+             <% goal.subgoals.each do |subgoal| %>
+               <li id="goal-id-<%=subgoal.id%>">
+                 <div class="goal">
+                    <p> <strong>Goal:</strong> <%= subgoal.title %> </p>
+                    <p> <strong>Description:</strong> <%= subgoal.description %> </p>
+                    <p> <strong>Deadline:</strong> <%= subgoal.deadline %> </p>
+                    <button type="button" class="btn btn-primary add-goal-button" data-toggle="modal" data-target="#myModal" id="parent-<%= subgoal.id %>">
+                     New Sub Goal
+                    </button>
+                 </div>
+                </li>
+              <% end %>
+            </ul>
         </div>
       </li>
+      <% end %>
     <% end %>
   </ul>
 <% end %>
+
 
 <!-- Button trigger modal -->
 
