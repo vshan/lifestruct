@@ -16,22 +16,12 @@ $( document ).ready(function() {
      <% if goal.subgoals.length > 0 || goal.parent.nil? %>
        <li id="goal-id-<%= goal.id %>">
          <div class="goal">
-           <p> <strong>Goal:</strong> <%= goal.title %> </p>
-           <p> <strong>Description:</strong> <%= goal.description %> </p>
-           <p> <strong>Deadline:</strong> <%= goal.deadline %> </p>
-           <button type="button" class="btn btn-primary btn-xs add-goal-button" data-toggle="modal" data-target="#myModal" id="parent-<%= goal.id %>">
-             New Sub Goal
-           </button>
+           <%= render 'goaly', goal: goal %>
            <ul>
              <% goal.subgoals.each do |subgoal| %>
                <li id="goal-id-<%=subgoal.id%>">
                  <div class="goal">
-                    <p> <strong>Goal:</strong> <%= subgoal.title %> </p>
-                    <p> <strong>Description:</strong> <%= subgoal.description %> </p>
-                    <p> <strong>Deadline:</strong> <%= subgoal.deadline %> </p>
-                    <button type="button" class="btn btn-primary add-goal-button" data-toggle="modal" data-target="#myModal" id="parent-<%= subgoal.id %>">
-                     New Sub Goal
-                    </button>
+                    <%= render 'goaly', goal: subgoal %>
                  </div>
                 </li>
               <% end %>
