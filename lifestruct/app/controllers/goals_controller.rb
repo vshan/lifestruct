@@ -19,6 +19,10 @@ class GoalsController < ApplicationController
     redirect_to '/home'
   end
 
+  def calendar
+    
+  end
+
   def show_subgoals
     goal_parent_id = params[:parentid]
     @ul_con = "#ul-parent-#{goal_parent_id}"

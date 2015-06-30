@@ -10,6 +10,8 @@ Lifestruct::Application.routes.draw do
 
   get 'goals/show_subgoals/:parentid' => 'goals#show_subgoals'
 
+  get 'goals/calendar'
+
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'
 
