@@ -6,15 +6,6 @@ $(document).on("click", ".add-goal-button", function(e) {
   console.log(parent_id);
 });
 
-function fix()
-{
-    var el = this;
-    var par = el.parentNode;
-    var next = el.nextSibling;
-    par.removeChild(el);
-    setTimeout(function() {par.insertBefore(el, next);}, 0)
-}
-
 </script>
 
   <h2> All Goals </h2>
@@ -36,10 +27,6 @@ function fix()
       </div>
       <div class="modal-body">
         <%= render 'homes/form' %>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
       </div>
     </div>
   </div>

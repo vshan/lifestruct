@@ -1,7 +1,7 @@
 <%= bootstrap_form_for(:goal) do |f| %>
-  <%= f.text_field :title %>
-  <%= f.text_area :description %>
+  <%= f.text_field :title, class: 'span4' %>
+  <%= f.text_area :description, class: 'span4', :cols => "20", :rows => "6", placeholder: "Describe the goal..." %>
   <%= f.datetime_field :deadline %>
   <%= f.hidden_field :parent_id %>
-  <%= f.submit "Create" %>
+  <%= f.submit "Create", class: 'btn btn-primary', style: 'float: right;' %>
 <% end %>
