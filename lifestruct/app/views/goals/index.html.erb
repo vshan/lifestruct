@@ -1,38 +1,28 @@
 <script>
-$( document ).ready(function() {
-  $('.add-goal-button').on('click', function(event) {
-    var btnid = $(this).attr('id');
-    var parent_id = btnid.split("-")[1];
-    $('#goal_parent_id').attr('value', parent_id);
-    console.log(parent_id);
-  });
+$(document).on("click", ".add-goal-button", function(e) {
+  var btnid = $(this).attr('id');
+  var parent_id = btnid.split("-")[1];
+  $('#goal_parent_id').attr('value', parent_id);
+  console.log(parent_id);
 });
+
+function fix()
+{
+    var el = this;
+    var par = el.parentNode;
+    var next = el.nextSibling;
+    par.removeChild(el);
+    setTimeout(function() {par.insertBefore(el, next);}, 0)
+}
+
 </script>
 
-<% if @goals.size > 0 %>
   <h2> All Goals </h2>
   <ul class="goals">
-    <% @goals.each do |goal| %>
-     <% if goal.subgoals.length > 0 || goal.parent.nil? %>
-       <li id="goal-id-<%= goal.id %>">
-         <div class="goal">
-           <%= render 'goaly', goal: goal %>
-           <ul>
-             <% goal.subgoals.each do |subgoal| %>
-               <li id="goal-id-<%=subgoal.id%>">
-                 <div class="goal">
-                    <%= render 'goaly', goal: subgoal %>
-                 </div>
-                </li>
-              <% end %>
-            </ul>
-        </div>
-      </li>
-      <% end %>
+    <% @root_goals.each do |goal| %>
+      <%= render 'goaly', goal: goal %>
     <% end %>
   </ul>
-<% end %>
-
 <!-- Button trigger modal -->
 
 

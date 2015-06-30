@@ -1,6 +1,17 @@
+<li id="goal-id-<%= goal.id %>">
+<div class="goal">
 <h3> <%= goal.title %>  </h3>
 <p> <%= goal.description %> </p>
 <p> <strong>Deadline:</strong> <%= goal.deadline %> </p>
 <button type="button" class="btn btn-primary btn-small add-goal-button" data-toggle="modal" data-target="#myModal" id="parent-<%= goal.id %>">
-  New Sub Goal
+    <i class="icon-plus icon-white"></i> 
 </button>
+<% if goal.subgoals.length > 0 %>
+  <%= link_to "/goals/show_subgoals/#{goal.id}", class: "btn btn-small", id: "show-parent-#{goal.id}", remote: true do %>
+    <i class="icon-chevron-down icon-white"></i>
+  <% end %>
+<% end %>
+
+<ul id="ul-parent-<%=goal.id %>"></ul>
+</div>
+</li>

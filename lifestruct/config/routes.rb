@@ -8,6 +8,8 @@ Lifestruct::Application.routes.draw do
   resources :goals
   root 'homes#show'
 
+  get 'goals/show_subgoals/:parentid' => 'goals#show_subgoals'
+
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'
 

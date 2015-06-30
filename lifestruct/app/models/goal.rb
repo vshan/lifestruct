@@ -3,4 +3,8 @@ class Goal < ActiveRecord::Base
                       foreign_key: "parent_id"
 
   belongs_to :parent, class_name: "Goal"
+
+  def self.root_goals
+    Goal.where(parent_id: nil)
+  end
 end

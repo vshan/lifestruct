@@ -1,0 +1,9 @@
+if ($("<%= escape_javascript @ul_con %> li").length == 0) {
+  $("<%= escape_javascript @show_sg_icn_path %>").attr('class', 'icon-chevron-up icon-white');
+  <% @subgoals.each do |subgoal| %>
+    $("<%= escape_javascript @ul_con %>").append("<%= escape_javascript render 'goaly', goal: subgoal %>");
+  <% end %>
+} else {
+  $("<%= escape_javascript @show_sg_icn_path %>").attr('class', 'icon-chevron-down icon-white');
+  $("<%= escape_javascript @ul_con %>").empty();
+}
