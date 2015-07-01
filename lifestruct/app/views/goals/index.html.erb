@@ -8,12 +8,12 @@ $(document).on("click", ".add-goal-button", function(e) {
 
 </script>
 
-  <h2> All Goals </h2>
-  <ul class="goals">
-    <% @root_goals.each do |goal| %>
-      <%= render 'goaly', goal: goal %>
-    <% end %>
-  </ul>
+<h2> All Goals </h2>
+<ul class="goals">
+  <% @root_goals.each do |goal| %>
+    <%= render 'goaly', goal: goal %>
+  <% end %>
+</ul>
 <!-- Button trigger modal -->
 
 
