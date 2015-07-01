@@ -20,7 +20,16 @@ class GoalsController < ApplicationController
   end
 
   def calendar
-    
+    @current_date = Date.today
+    @current_date = @current_date.strftime('%a %d %b %Y')
+
+    @current_goals = TimeTile.by_day(@current_date)
+
+    if @current_goals.length == 0
+      assign_goals
+    else
+      print_goals
+    end 
   end
 
   def show_subgoals
