@@ -1,4 +1,9 @@
 class GoalsController < ApplicationController
+  before_filter :set_time_zone
+
+  def set_time_zone
+    Time.zone = "Mumbai"    
+  end
   def index
     @goals = Goal.all
     @root_goals = Goal.root_goals
@@ -8,7 +13,7 @@ class GoalsController < ApplicationController
     @new_goal = Goal.new
     title = goal_params[:title]
     description = goal_params[:description]
-    deadline = goal_params[:deadline]
+    deadline = stringify_date(goal_params[:"deadline(1i)"], goal_params[:"deadline(2i)"], goal_params[:"deadline(3i)"], goal_params[:"deadline(4i)"], goal_params[:"deadline(5i)"])
     parent_id = goal_params[:parent_id].to_i
     @new_goal.assign_attributes({title: title,
        description: description,
@@ -19,6 +24,10 @@ class GoalsController < ApplicationController
     redirect_to '/home'
   end
 
+  def stringify_date(year, month, day, hour, min)
+    datetime = "#{year}-#{month}-#{day} #{hour}:#{min}"
+  end
+
   def calendar
     @current_date = Date.today
     @current_date = @current_date.strftime('%a %d %b %Y')
@@ -26,7 +35,7 @@ class GoalsController < ApplicationController
     @current_goals = TimeTile.by_day(@current_date)
 
     if @current_goals.length == 0
-      assign_goals
+      TimeTile.assign_goals(@current_date)
     else
       print_goals
     end 
@@ -46,7 +55,7 @@ class GoalsController < ApplicationController
   private
 
   def goal_params
-    params.require(:goal).permit(:title, :description, :deadline, :parent_id)
+    params.require(:goal).permit(:title, :"deadline(1i)", :"deadline(2i)", :"deadline(3i)", :"deadline(4i)", :"deadline(5i)", :deadline, :parent_id)
   end
 
 end
