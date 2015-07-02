@@ -1,9 +1,5 @@
 class GoalsController < ApplicationController
-  before_filter :set_time_zone
 
-  def set_time_zone
-    Time.zone = "Mumbai"    
-  end
   def index
     @goals = Goal.all
     @root_goals = Goal.root_goals
@@ -29,7 +25,13 @@ class GoalsController < ApplicationController
     sunday_stat = goal_params[:repeat7]
     month_stat = goal_params[:repeat8]
     all_stats = [monday_stat, tuesday_stat, wednesday_stat, thursday_stat, friday_stat, saturday_stat, sunday_stat, month_stat]
-    parent_id = goal_params[:parent_id].to_i
+    parent_id = goal_params[:parent_id]
+
+    if parent_id.empty?
+      parent_id = nil
+    else
+      parent_id = parent_id.to_i
+    end
 
     if hardcode_time == 1
       deadline = nil
@@ -58,7 +60,7 @@ class GoalsController < ApplicationController
        parent_id: parent_id
       })
     @new_goal.save
-    redirect_to '/home'
+    redirect_to goals_path
   end
 
   def stringify_date(year, month, day, hour, min)
