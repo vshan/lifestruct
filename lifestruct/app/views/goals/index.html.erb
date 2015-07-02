@@ -1,5 +1,8 @@
 <script>
-$("#repeat-stat-form").hide();
+$(document).ready(function() {
+  $("#repeat-stat-form").hide();
+  $("#hardcode-time").hide();
+});
 $(document).on("click", ".add-goal-button", function(e) {
   var btnid = $(this).attr('id');
   var parent_id = btnid.split("-")[1];
@@ -15,6 +18,18 @@ $(document).on("click", "#goal_repeatable", function(e) {
     $("#repeat-stat-form").hide();
   }
 });
+
+$(document).on("click", "#goal_hardcode_time", function(e) {
+  var val_stat = $(this).is(":checked");
+  if (val_stat) {
+    $("#hardcode-time").show();
+    $("#deadline-select-div").hide();
+  } else {
+    $("#hardcode-time").hide();
+    $("#deadline-select-div").show();
+  }
+});
+
 
 </script>
 

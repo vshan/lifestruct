@@ -1,3 +1,31 @@
+<script>
+$(document).ready(function() {
+  $("#repeat-stat-form").hide();
+  $("#hardcode-time").hide();
+});
+
+$(document).on("click", "#goal_repeatable", function(e) {
+  var val_stat = $(this).is(":checked");
+  if (val_stat) {
+    $("#repeat-stat-form").show();
+  } else {
+    $("#repeat-stat-form").hide();
+  }
+});
+
+$(document).on("click", "#goal_hardcode_time", function(e) {
+  var val_stat = $(this).is(":checked");
+  if (val_stat) {
+    $("#hardcode-time").show();
+    $("#deadline-select-div").hide();
+  } else {
+    $("#hardcode-time").hide();
+    $("#deadline-select-div").show();
+  }
+});
+
+</script>
+
 <div id="calendar"></div>
 
 <div id="interactionContainer"></div>

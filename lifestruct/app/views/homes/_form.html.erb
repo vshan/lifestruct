@@ -1,7 +1,6 @@
 <%= bootstrap_form_for(:goal) do |f| %>
   <%= f.text_field :title, class: 'span4' %>
   <%= f.text_area :description, class: 'span4', :cols => "20", :rows => "6", placeholder: "Describe the goal..." %>
-  <%= f.datetime_select :deadline %>
   <%= f.check_box :repeatable? %>
   <div id="repeat-stat-form">
   <%= f.form_group :repeatstat, label: { text: "Repeats every..." } do %>
@@ -30,6 +29,14 @@
       Month
     <% end %>
   <% end %>
+  </div>
+  <%= f.check_box :hardcode_time? %>
+  <div id="hardcode-time">
+    <%= f.datetime_select :starttime %>
+    <%= f.datetime_select :endtime %>
+  </div>
+  <div id="deadline-select-div">
+    <%= f.datetime_select :deadline %>
   </div>
   <%= f.hidden_field :parent_id %>
   <%= f.submit "Create", class: 'btn btn-primary', style: 'float: right;' %>
