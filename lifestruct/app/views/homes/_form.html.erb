@@ -2,6 +2,35 @@
   <%= f.text_field :title, class: 'span4' %>
   <%= f.text_area :description, class: 'span4', :cols => "20", :rows => "6", placeholder: "Describe the goal..." %>
   <%= f.datetime_select :deadline %>
+  <%= f.check_box :repeatable? %>
+  <div id="repeat-stat-form">
+  <%= f.form_group :repeatstat, label: { text: "Repeats every..." } do %>
+    <%= f.check_box :repeat1 do %>
+      Monday
+    <% end %>
+    <%= f.check_box :repeat2 do %>
+      Tuesday
+    <% end %>
+    <%= f.check_box :repeat3 do %>
+      Wednesday
+    <% end %>
+    <%= f.check_box :repeat4 do %>
+      Thursday
+    <% end %>
+    <%= f.check_box :repeat5 do %>
+      Friday
+    <% end %>
+    <%= f.check_box :repeat6 do %>
+      Saturday
+    <% end %>
+    <%= f.check_box :repeat7 do %>
+      Sunday
+    <% end %>
+    <%= f.check_box :repeat8 do %>
+      Month
+    <% end %>
+  <% end %>
+  </div>
   <%= f.hidden_field :parent_id %>
   <%= f.submit "Create", class: 'btn btn-primary', style: 'float: right;' %>
 <% end %>

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150626094329) do
+ActiveRecord::Schema.define(version: 20150702055758) do
 
   create_table "goal_logs", force: true do |t|
     t.string   "title"
@@ -35,6 +35,8 @@ ActiveRecord::Schema.define(version: 20150626094329) do
     t.datetime "deadline"
     t.integer  "repeatable"
     t.integer  "priority"
+    t.datetime "start"
+    t.datetime "end"
   end
 
   add_index "goals", ["parent_id"], name: "index_goals_on_parent_id", using: :btree

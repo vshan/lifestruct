@@ -10,6 +10,8 @@ class GoalsController < ApplicationController
   end
   
   def create
+    render text: params
+    return
     @new_goal = Goal.new
     title = goal_params[:title]
     description = goal_params[:description]
