@@ -2,7 +2,18 @@
   <div class="goal">
   <h3> <%= goal.title %>  </h3>
   <p> <%= goal.description %> </p>
-  <p> <strong>Deadline:</strong> <%= goal.deadline %> </p>
+  <% if goal.repeatable %> 
+    <p> <strong> Repeat code: </strong> <%= goal.repeatable %> </p>
+  <% end %>
+  <% if goal.deadline %>
+    <p> <strong>Deadline:</strong> <%= goal.deadline %> </p>
+  <% end %>
+  <% if goal.start %>
+    <p> <strong>Start Time:</strong> <%= goal.start %> </p>
+  <% end %>
+  <% if goal.end %>
+    <p> <strong>End Time:</strong> <%= goal.end %> </p>
+  <% end %>
   <button type="button" class="btn btn-primary btn-small add-goal-button" data-toggle="modal" data-target="#myModal" id="parent-<%= goal.id %>">
     <i class="icon-plus icon-white"></i> 
   </button>

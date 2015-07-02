@@ -10,16 +10,51 @@ class GoalsController < ApplicationController
   end
   
   def create
-    render text: params
-    return
+    #render text: params
+    #return
     @new_goal = Goal.new
     title = goal_params[:title]
     description = goal_params[:description]
     deadline = stringify_date(goal_params[:"deadline(1i)"], goal_params[:"deadline(2i)"], goal_params[:"deadline(3i)"], goal_params[:"deadline(4i)"], goal_params[:"deadline(5i)"])
+    starttime = stringify_date(goal_params[:"starttime(1i)"], goal_params[:"starttime(2i)"], goal_params[:"starttime(3i)"], goal_params[:"starttime(4i)"], goal_params[:"starttime(5i)"])
+    endtime =  stringify_date(goal_params[:"endtime(1i)"], goal_params[:"endtime(2i)"], goal_params[:"endtime(3i)"], goal_params[:"endtime(4i)"], goal_params[:"endtime(5i)"]) 
+    repeatable = goal_params[:repeatable].to_i
+    hardcode_time = goal_params[:hardcode_time].to_i
+    monday_stat = goal_params[:repeat1]
+    tuesday_stat = goal_params[:repeat2]
+    wednesday_stat = goal_params[:repeat3]
+    thursday_stat = goal_params[:repeat4]
+    friday_stat = goal_params[:repeat5]
+    saturday_stat = goal_params[:repeat6]
+    sunday_stat = goal_params[:repeat7]
+    month_stat = goal_params[:repeat8]
+    all_stats = [monday_stat, tuesday_stat, wednesday_stat, thursday_stat, friday_stat, saturday_stat, sunday_stat, month_stat]
     parent_id = goal_params[:parent_id].to_i
+
+    if hardcode_time == 1
+      deadline = nil
+    else
+      starttime = nil
+      endtime = nil
+    end
+
+    repeat_stat = nil
+    if repeatable == 1
+      rep_string = ""
+      all_stats.each_with_index do |stat, index|
+        if stat == "1"
+          rep_string += (index + 1).to_s
+        end
+      end
+      repeat_stat = rep_string.to_i
+    end
+
     @new_goal.assign_attributes({title: title,
        description: description,
        deadline: deadline,
+       start: starttime,
+       repeatable: repeat_stat,
+       :end => endtime,
        parent_id: parent_id
       })
     @new_goal.save
@@ -57,7 +92,7 @@ class GoalsController < ApplicationController
   private
 
   def goal_params
-    params.require(:goal).permit(:title, :"deadline(1i)", :"deadline(2i)", :"deadline(3i)", :"deadline(4i)", :"deadline(5i)", :deadline, :parent_id)
+    params.require(:goal).permit(:title, :description, :"deadline(1i)", :"deadline(2i)", :"deadline(3i)", :"deadline(4i)", :"deadline(5i)", :"starttime(1i)", :"starttime(2i)", :"starttime(3i)", :"starttime(4i)", :"starttime(5i)", :"endtime(1i)", :"endtime(2i)", :"endtime(3i)", :"endtime(4i)", :"endtime(5i)", :repeatable, :hardcode_time, :repeat1, :repeat2, :repeat3, :repeat4, :repeat5, :repeat6, :repeat7, :repeat8, :deadline, :parent_id)
   end
 
 end
