@@ -52,6 +52,20 @@ class Goal < ActiveRecord::Base
     end
   end
 
+  # Make this amount of siblings
+  def number_of_siblings_on(date)
+    cur_goal_paren = self.parent_id
+    sibling_count = 0
+    goal_maps = GoalMap.where(:start => date)
+    goal_parens = goal_maps.map {|g_m| g_m.parent_id }
+    goal_parens.each do |paren|
+      if paren == cur_goal_paren
+        sibling_count += 1
+      end
+    end
+    sibling_count
+  end
+
   private
 
   def find_start_time
@@ -59,5 +73,17 @@ class Goal < ActiveRecord::Base
     time_alloc = current_goal.timetaken
     deadline = current_goal.deadline
     days_left = Date.today - deadline.to_date
+    date_array = []
+    date_array.each do |date|
+      if assinged_on_this(date).parents.include?(current_goal.parent)
+        next
+      else
+        assign_on_this_date
+      end
+    end
+    index = 0
+    while (current_goal.number_of_siblings_on(date_array[index]) < current_goal.number_of_siblings_on(date_array[index+1]))
+      #...
+    end
   end
 end
