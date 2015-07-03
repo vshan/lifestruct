@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150702055758) do
+ActiveRecord::Schema.define(version: 20150703055550) do
 
   create_table "goal_logs", force: true do |t|
     t.string   "title"
@@ -20,6 +20,14 @@ ActiveRecord::Schema.define(version: 20150702055758) do
     t.datetime "start"
     t.datetime "end"
     t.text     "category"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "goal_maps", force: true do |t|
+    t.integer  "goal_id"
+    t.integer  "status_id"
+    t.integer  "in_week"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -37,6 +45,7 @@ ActiveRecord::Schema.define(version: 20150702055758) do
     t.integer  "priority"
     t.datetime "start"
     t.datetime "end"
+    t.integer  "has_child"
   end
 
   add_index "goals", ["parent_id"], name: "index_goals_on_parent_id", using: :btree

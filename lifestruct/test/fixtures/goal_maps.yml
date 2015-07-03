@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  goal_id: 1
+  status_id: 1
+  in_week: 1
+
+two:
+  goal_id: 1
+  status_id: 1
+  in_week: 1
