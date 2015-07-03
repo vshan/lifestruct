@@ -36,6 +36,7 @@
     <%= f.datetime_select :endtime %>
   </div>
   <div id="deadline-select-div">
+    <%= f.number_field :allocate_minutes %>
     <%= f.datetime_select :deadline %>
   </div>
   <%= f.hidden_field :parent_id %>

@@ -39,6 +39,7 @@ class GoalsController < ApplicationController
     else
       starttime = nil
       endtime = nil
+      time_alloc = goal_params[:allocate_minutes]
     end
 
     repeat_stat = nil
@@ -58,7 +59,8 @@ class GoalsController < ApplicationController
        start: starttime,
        repeatable: repeat_stat,
        :end => endtime,
-       parent_id: parent_id
+       parent_id: parent_id,
+       timetaken: time_alloc
       })
     @new_goal.save
     redirect_to goals_path
@@ -95,7 +97,7 @@ class GoalsController < ApplicationController
   private
 
   def goal_params
-    params.require(:goal).permit(:title, :description, :"deadline(1i)", :"deadline(2i)", :"deadline(3i)", :"deadline(4i)", :"deadline(5i)", :"starttime(1i)", :"starttime(2i)", :"starttime(3i)", :"starttime(4i)", :"starttime(5i)", :"endtime(1i)", :"endtime(2i)", :"endtime(3i)", :"endtime(4i)", :"endtime(5i)", :repeatable, :hardcode_time, :repeat1, :repeat2, :repeat3, :repeat4, :repeat5, :repeat6, :repeat7, :repeat8, :deadline, :parent_id)
+    params.require(:goal).permit(:allocate_minutes, :title, :description, :"deadline(1i)", :"deadline(2i)", :"deadline(3i)", :"deadline(4i)", :"deadline(5i)", :"starttime(1i)", :"starttime(2i)", :"starttime(3i)", :"starttime(4i)", :"starttime(5i)", :"endtime(1i)", :"endtime(2i)", :"endtime(3i)", :"endtime(4i)", :"endtime(5i)", :repeatable, :hardcode_time, :repeat1, :repeat2, :repeat3, :repeat4, :repeat5, :repeat6, :repeat7, :repeat8, :deadline, :parent_id)
   end
 
 end
