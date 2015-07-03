@@ -52,7 +52,6 @@ class Goal < ActiveRecord::Base
     end
   end
 
-  # Make this amount of siblings
   def number_of_siblings_on(date)
     cur_goal_paren = self.parent_id
     sibling_count = 0
@@ -72,18 +71,17 @@ class Goal < ActiveRecord::Base
     current_goal = self
     time_alloc = current_goal.timetaken
     deadline = current_goal.deadline
-    days_left = Date.today - deadline.to_date
-    date_array = []
-    date_array.each do |date|
-      if assinged_on_this(date).parents.include?(current_goal.parent)
-        next
-      else
-        assign_on_this_date
-      end
-    end
+    date_array = (Date.today..deadline.to_date).to_a
     index = 0
-    while (current_goal.number_of_siblings_on(date_array[index]) < current_goal.number_of_siblings_on(date_array[index+1]))
-      #...
+    date_size = date_array.length
+    while (current_goal.number_of_siblings_on(date_array[index%date_size]) > current_goal.number_of_siblings_on(date_array[(index+1)%date_size]))
+      index += 1
+    end
+    req_date = date_array[index%date_size]
+    if free_space_on?(req_date)
+      #..
+    else
+      #..
     end
   end
 end
