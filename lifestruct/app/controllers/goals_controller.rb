@@ -31,6 +31,7 @@ class GoalsController < ApplicationController
       parent_id = nil
     else
       parent_id = parent_id.to_i
+      Goal.find(parent_id).update_attribute(:has_child, 1)
     end
 
     if hardcode_time == 1
@@ -57,7 +58,8 @@ class GoalsController < ApplicationController
        start: starttime,
        repeatable: repeat_stat,
        :end => endtime,
-       parent_id: parent_id
+       parent_id: parent_id,
+       has_child: 0
       })
     @new_goal.save
     redirect_to goals_path
