@@ -58,8 +58,7 @@ class GoalsController < ApplicationController
        start: starttime,
        repeatable: repeat_stat,
        :end => endtime,
-       parent_id: parent_id,
-       has_child: 0
+       parent_id: parent_id
       })
     @new_goal.save
     redirect_to goals_path

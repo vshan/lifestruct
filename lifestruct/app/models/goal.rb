@@ -7,4 +7,8 @@ class Goal < ActiveRecord::Base
   def self.root_goals
     Goal.where(parent_id: nil)
   end
+
+  def self.leaf_goals
+    Goal.where(has_child: nil)
+  end
 end

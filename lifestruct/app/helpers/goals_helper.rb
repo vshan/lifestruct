@@ -24,6 +24,7 @@ module GoalsHelper
         decoded_str = decoded_str + decode_map[char] + ", "
       end
     end
+    decoded_str = (decode_map[rep_code.to_s] + ".") if rep_code_len == 1
     decoded_str
   end
 end
