@@ -87,6 +87,13 @@ class Goal < ActiveRecord::Base
     free_space_avail[1]
   end
 
+  def free_time_between(start_time, end_time)
+    GoalMap.all.map {|g_m| g_m.goal}.select do |g| 
+      (((g.start >= start_time) && (g.end <= end_time)) || ((g.start >= start_time) && (g.start <= end_time)) || ((g.end >= start_time) && (g.end <= end_time)) || ((g.start < start_time) && (g.end > end_time))) 
+    end.each {|g| #g.assign }
+    }
+  end
+
   def free_space_on?(date)
     cur_goal = self
     req_time = cur_goal.timetaken
