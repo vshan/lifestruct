@@ -32,13 +32,22 @@ class Goal < ActiveRecord::Base
   def assign(properties)
     cur_goal = self
     if properties[:status] == "hard_code"
+      displaced_goals = free_time_between(cur_goal.start, cur_goal.end)
       goal_map = GoalMap.new
       goal_map.assign_attributes({goal_id: cur_goal.id,
                                   status_id: 2,
                                   in_week: cur_goal.in_week?})
       goal_map.save
+      displaced_goals.each {|goal| goal.assign({status: "fluid"})}
     elsif properties[:status] == "fluid"
-      cur_goal.find_start_time
+      goal_start_time = cur_goal.find_start_time
+      goal_map = GoalMap.new
+      goal_map.assign_attributes({goal_id: cur_goal.id,
+                                  status_id: 3,
+                                  in_week: cur_goal.in_week?})
+      goal_map.save
+      cur_goal.update(start: goal_start_time)
+      cur_goal.update(:end => (goal_start_time.to_time + (cur_goal.timetaken)*60 ).to_datetime)
     end
     cur_goal.update_attribute(:prop, 1)
   end
@@ -47,7 +56,7 @@ class Goal < ActiveRecord::Base
     time = cur_goal.start || cur_goal.deadline
     cur_goal = self
     week_end_date = Date.today + 7
-    if time < week_end_date
+    if time.to_date < week_end_date
       return 1
     else
       return 0
@@ -82,22 +91,41 @@ class Goal < ActiveRecord::Base
         # NO DAYS ARE FREE.
         # FIND FIRST FREE SPACE
         # SWAP
+        swap_goal = GoalMap.all.map {|g_m| g_m.goal}.select {|g| date_array.contain?(g.start.to_date) && g.deadline > current_goal.deadline && g.timetaken >= time_alloc}.take(1)
+        start_time_goal = swap_goal.start
+        # Delete the goalmap entry for swap_goal
+        # add new goalmap entry in the same place as swap_goal
+        # Assign swap_goal again
+        swap_goal.clear_goal_from_gm!
+        return start_time_goal
       end
     end
-    free_space_avail[1]
+    return free_space_avail[1]
+  end
+
+  def clear_goal_from_gm!
+    cur_goal = self
+    cur_goal.start = nil
+    cur_goal.end = nil
+    cur_goal.prop = nil
+    cur_goal.goal_map.destroy
+    cur_goal.save
   end
 
   def free_time_between(start_time, end_time)
-    GoalMap.all.map {|g_m| g_m.goal}.select do |g| 
-      (((g.start >= start_time) && (g.end <= end_time)) || ((g.start >= start_time) && (g.start <= end_time)) || ((g.end >= start_time) && (g.end <= end_time)) || ((g.start < start_time) && (g.end > end_time))) 
-    end.each {|g| #g.assign }
-    }
+    selected_goals = GoalMap.all.map {|g_m| g_m.goal}.select do |g| 
+      (((g.start >= start_time) && (g.end <= end_time)) || ((g.start >= start_time) && (g.start <= end_time)) || ((g.end >= start_time) && (g.end <= end_time)) || ((g.start < start_time) && (g.end > end_time)) && (g.deadline)) 
+    end
+    selected_goals.each do |goal|
+      goal.clear_goal_from_gm!
+    end
+    selected_goals
   end
 
   def free_space_on?(date)
     cur_goal = self
     req_time = cur_goal.timetaken
-    goals = GoalMap.all.map {|g_m| g_m.goal }.select {|g| g.start.to_date == date }
+    goals = GoalMap.all.map {|g_m| g_m.goal }.select {|g| g.start.to_date == date }.sort_by {|g| g.start }
     index = 0
     goal_len = goals.length
     if goal_len == 0

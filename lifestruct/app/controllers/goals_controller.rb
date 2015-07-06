@@ -63,6 +63,10 @@ class GoalsController < ApplicationController
        timetaken: time_alloc
       })
     @new_goal.save
+    unless @new_goal.timetaken
+      time_taken = (@new_goal.end.to_time - @new_goal.start.to_time)/60
+      @new_goal.update_attribute(:timetaken, time_taken)
+    end
     redirect_to goals_path
   end
 
