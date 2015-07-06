@@ -38,18 +38,24 @@ class Goal < ActiveRecord::Base
                                   status_id: 2,
                                   in_week: cur_goal.in_week?})
       goal_map.save
+      cur_goal.update_attribute(:prop, 1)
       displaced_goals.each {|goal| goal.assign({status: "fluid"})}
     elsif properties[:status] == "fluid"
-      goal_start_time = cur_goal.find_start_time
+      if properties[:date_range]
+        goal_start_time = cur_goal.find_start_time(properties[:date_range])
+      else
+        goal_start_time = cur_goal.find_start_time
+      end
       goal_map = GoalMap.new
       goal_map.assign_attributes({goal_id: cur_goal.id,
                                   status_id: 3,
                                   in_week: cur_goal.in_week?})
       goal_map.save
-      cur_goal.update(start: goal_start_time)
-      cur_goal.update(:end => (goal_start_time.to_time + (cur_goal.timetaken)*60 ).to_datetime)
+      cur_goal.prop = 1
+      cur_goal.start = goal_start_time
+      cur_goal.end = (goal_start_time.to_time + ((cur_goal.timetaken)*60)).to_datetime
+      cur_goal.save
     end
-    cur_goal.update_attribute(:prop, 1)
   end
 
   def in_week?
@@ -75,11 +81,14 @@ class Goal < ActiveRecord::Base
     sibling_count
   end
 
-  def find_start_time
+  def find_start_time(date_arr = nil)
     current_goal = self
     time_alloc = current_goal.timetaken
-    deadline = current_goal.deadline
-    date_array = (Date.today..deadline.to_date).to_a
+    if date_arr
+      date_array = date_arr.to_a
+    else
+      date_array = (Date.today..current_goal.deadline.to_date).to_a
+    end
     
     req_date = current_goal.find_suitable_date(date_array)
     free_space_avail = current_goal.free_space_on?(req_date)
@@ -88,22 +97,17 @@ class Goal < ActiveRecord::Base
         req_date = current_goal.find_suitable_date(date_array)
         free_space_avail = current_goal.free_space_on?(req_date)
       else
-        # NO DAYS ARE FREE.
-        # FIND FIRST FREE SPACE
-        # SWAP
         swap_goal = GoalMap.all.map {|g_m| g_m.goal}.select {|g| date_array.contain?(g.start.to_date) && g.deadline > current_goal.deadline && g.timetaken >= time_alloc}.take(1)
         start_time_goal = swap_goal.start
-        # Delete the goalmap entry for swap_goal
-        # add new goalmap entry in the same place as swap_goal
-        # Assign swap_goal again
-        swap_goal.clear_goal_from_gm!
+        swap_goal.unassign_fluid_goal!
+        swap_goal.assign({status: "fluid", date_range: (current_goal.deadline..swap_goal.deadline)})
         return start_time_goal
       end
     end
     return free_space_avail[1]
   end
 
-  def clear_goal_from_gm!
+  def unassign_fluid_goal!
     cur_goal = self
     cur_goal.start = nil
     cur_goal.end = nil
@@ -117,7 +121,7 @@ class Goal < ActiveRecord::Base
       (((g.start >= start_time) && (g.end <= end_time)) || ((g.start >= start_time) && (g.start <= end_time)) || ((g.end >= start_time) && (g.end <= end_time)) || ((g.start < start_time) && (g.end > end_time)) && (g.deadline)) 
     end
     selected_goals.each do |goal|
-      goal.clear_goal_from_gm!
+      goal.unassign_fluid_goal!
     end
     selected_goals
   end

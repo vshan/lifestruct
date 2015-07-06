@@ -4,6 +4,15 @@ class GoalsController < ApplicationController
     @goals = Goal.all
     @root_goals = Goal.root_goals
   end
+
+  def show
+    @goal = Goal.find(params[:id])
+  end
+
+  def assign
+    Goal.assign_goals
+    redirect_to goals_calendar_path    
+  end
   
   def create
     #render text: params
@@ -75,16 +84,7 @@ class GoalsController < ApplicationController
   end
 
   def calendar
-    @current_date = Date.today
-    @current_date = @current_date.strftime('%a %d %b %Y')
-
-    @current_goals = TimeTile.by_day(@current_date)
-
-    if @current_goals.length == 0
-      TimeTile.assign_goals(@current_date)
-    else
-      print_goals
-    end 
+    @asgn_goals = GoalMap.all.map{ |gm| gm.goal }.sort_by(&:start)
   end
 
   def show_subgoals
