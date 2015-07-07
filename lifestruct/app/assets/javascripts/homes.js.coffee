@@ -13,5 +13,6 @@ $(document).ready ->
        start: '10:00'
        end: '18:00'
        dow: [1,2,3,4,5]
+     events: '/goals/calendar.json'
 
 

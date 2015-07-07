@@ -117,7 +117,6 @@ class Goal < ActiveRecord::Base
   end
 
   def free_time_between(start_time, end_time)
-    puts "CALLING GOAL OBJECT: #{self.title}"
     selected_goals = GoalMap.all.map {|g_m| g_m.goal}.select do |g| 
       (((g.start >= start_time) && (g.end <= end_time)) || ((g.start >= start_time) && (g.start <= end_time)) || ((g.end >= start_time) && (g.end <= end_time)) || ((g.start < start_time) && (g.end > end_time))) && (!g.deadline.nil?)
     end
@@ -130,11 +129,7 @@ class Goal < ActiveRecord::Base
   def free_space_on?(date)
     cur_goal = self
     req_time = cur_goal.timetaken
-    puts "FREE SPACE CHECKING FOR #{self.title}!!!"
-    goals = GoalMap.all.map {|g_m| g_m.goal }.select {|g| 
-      puts "#{g.start.to_date} ---- #{g.end.to_date}"
-      (g.start.to_date..g.end.to_date).to_a.include?(date) }.sort_by {|g| g.start 
-    }
+    goals = GoalMap.all.map {|g_m| g_m.goal }.select {|g|  (g.start.to_date..g.end.to_date).to_a.include?(date) }.sort_by {|g| g.start }
     puts goals.inspect
     index = 0
     goal_len = goals.length

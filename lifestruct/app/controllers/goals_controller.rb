@@ -85,6 +85,10 @@ class GoalsController < ApplicationController
 
   def calendar
     @asgn_goals = GoalMap.all.map{ |gm| gm.goal }.sort_by(&:start)
+    respond_to do |format|
+      format.json
+      format.html
+    end
   end
 
   def show_subgoals

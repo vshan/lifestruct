@@ -1,0 +1,21 @@
+<script>
+$(document).ready(function() {
+  $("#repeat-stat-form").hide();
+  $("#hardcode-time").hide();
+  $(".add-goal-button").hide();
+});
+$(document).on("click", ".add-goal-button", function(e) {
+  var btnid = $(this).attr('id');
+  var parent_id = btnid.split("-")[1];
+  $('#goal_parent_id').attr('value', parent_id);
+  console.log(parent_id);
+});
+
+
+</script>
+
+<ul class="goals">
+  <%= render 'goaly', goal: @goal %>
+</ul>
+<!-- Button trigger modal -->
+
