@@ -1,5 +1,5 @@
 <h2> <%= @current_date %> </h2>
 
 <% @asgn_goals.each do |goal| %>
-  <p><strong><% format_datetime goal.start %> — <% format_datetime goal.end %></strong> <%= goal.title %></p>
+  <p><strong><%= format_datetime(goal.start) %> — <%= format_datetime(goal.end) %></strong> <%= goal.title %></p>
 <% end %>
