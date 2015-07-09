@@ -11,7 +11,7 @@ class GoalsController < ApplicationController
 
   def assign
     Goal.assign_goals
-    redirect_to goals_calendar_path    
+    redirect_to '/home'   
   end
   
   def create
@@ -79,7 +79,15 @@ class GoalsController < ApplicationController
     redirect_to goals_path
   end
 
+  def string_to_datetime(year, month, day, hour, min)
+    DateTime.new(year.to_i, month.to_i, day.to_i, hour.to_i, min.to_i).change(offset: "+0530")
+  end
+
   def freetime
+    starttime = string_to_datetime(goal_params[:"starttime(1i)"], goal_params[:"starttime(2i)"], goal_params[:"starttime(3i)"], goal_params[:"starttime(4i)"], goal_params[:"starttime(5i)"])
+    endtime =  string_to_datetime(goal_params[:"endtime(1i)"], goal_params[:"endtime(2i)"], goal_params[:"endtime(3i)"], goal_params[:"endtime(4i)"], goal_params[:"endtime(5i)"]) 
+    displaced_goals = Goal.free_time_between(starttime, endtime)
+    displaced_goals.each {|goal| goal.assign({status: "fluid", date_range: (endtime..goal.deadline)})}
     redirect_to '/home'
   end
 
@@ -88,10 +96,34 @@ class GoalsController < ApplicationController
   end
 
   def calendar
-    @asgn_goals = GoalMap.all.map{ |gm| gm.goal }.sort_by(&:start)
+    @asgn_goals = []
+    start_date = build_date_from_date_string(params[:start])
+    fin_date = build_date_from_date_string(params[:end])
+    GoalMap.all.map{ |gm| gm.goal }.each do |goal|
+      if goal.repeatable
+        goals = goal.all_reps_in_bw(start_date, fin_date)
+        goals.each do |goal|
+          goal.start = goal.start.to_s
+          goal.end = goal.end.to_s
+        end
+        @asgn_goals.push(goals)
+      else
+        goal.start = goal.start.to_s
+        goal.end = goal.end.to_s
+        @asgn_goals.push(goal)
+      end
+    end
+    @asgn_goals.flatten!
     respond_to do |format|
       format.json
       format.html
+    end
+  end
+
+  def build_date_from_date_string(date_string)
+    if date_string.present?
+      date_array = date_string.split('-').map{|date_str| date_str.to_i}
+      return Date.new(*date_array) # Flatten the array and pass to Date.new
     end
   end
 

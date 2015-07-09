@@ -126,14 +126,74 @@ class Goal < ActiveRecord::Base
     selected_goals
   end
 
-  def make_proxy_for(date)
+  def all_reps_in_bw(start_date, fin_date)
+    goals = []
+    cur_goal = self
+    rep_codes = cur_goal.decode_rep_string
+    (start_date..fin_date).each do |date|
+      case date.strftime("%a")
+      when "Mon"
+        if rep_codes.include?(1)
+          start_time = (cur_goal.start.to_datetime + (date - cur_goal.start.to_date).to_i)
+          end_time = (cur_goal.end.to_datetime + (date - cur_goal.end.to_date).to_i)
+          goals << Goal.new({id: cur_goal.id, title: cur_goal.title, description: cur_goal.description, start: start_time, :end => end_time})
+        end
+      when "Tue"
+        if rep_codes.include?(2)
+          start_time = (cur_goal.start.to_datetime + (date - cur_goal.start.to_date).to_i)
+          end_time = (cur_goal.end.to_datetime + (date - cur_goal.end.to_date).to_i)
+          goals << Goal.new({id: cur_goal.id, title: cur_goal.title, description: cur_goal.description, start: start_time, :end => end_time})
+        end
+      when "Wed"
+        if rep_codes.include?(3)
+          start_time = (cur_goal.start.to_datetime + (date - cur_goal.start.to_date).to_i)
+          end_time = (cur_goal.end.to_datetime + (date - cur_goal.end.to_date).to_i)
+          goals << Goal.new({id: cur_goal.id, title: cur_goal.title, description: cur_goal.description, start: start_time, :end => end_time})
+        end
+      when "Thu"
+        if rep_codes.include?(4)
+          start_time = (cur_goal.start.to_datetime + (date - cur_goal.start.to_date).to_i)
+          end_time = (cur_goal.end.to_datetime + (date - cur_goal.end.to_date).to_i)
+          goals << Goal.new({id: cur_goal.id, title: cur_goal.title, description: cur_goal.description, start: start_time, :end => end_time})
+        end
+      when "Fri"
+        if rep_codes.include?(5)
+          start_time = (cur_goal.start.to_datetime + (date - cur_goal.start.to_date).to_i)
+          end_time = (cur_goal.end.to_datetime + (date - cur_goal.end.to_date).to_i)
+          goals << Goal.new({id: cur_goal.id, title: cur_goal.title, description: cur_goal.description, start: start_time, :end => end_time})
+        end
+      when "Sat"
+        if rep_codes.include?(6)
+          start_time = (cur_goal.start.to_datetime + (date - cur_goal.start.to_date).to_i)
+          end_time = (cur_goal.end.to_datetime + (date - cur_goal.end.to_date).to_i)
+          goals << Goal.new({id: cur_goal.id, title: cur_goal.title, description: cur_goal.description, start: start_time, :end => end_time})
+        end
+      when "Sun"
+        if rep_codes.include?(7)
+          start_time = (cur_goal.start.to_datetime + (date - cur_goal.start.to_date).to_i)
+          end_time = (cur_goal.end.to_datetime + (date - cur_goal.end.to_date).to_i)
+          goals << Goal.new({id: cur_goal.id, title: cur_goal.title, description: cur_goal.description, start: start_time, :end => end_time})
+        end
+      end
+    end
+    goals
+  end
+
+  def decode_rep_string
     cur_goal = self
     rep_codes = []
     rep_stat = cur_goal.repeatable.to_s
-    day_name = date.strftime("%a")
     rep_stat.each_char do |rep|
       rep_codes.push(rep.to_i)
     end
+    rep_codes
+  end
+
+  def make_proxy_for(date)
+    cur_goal = self
+    rep_codes = cur_goal.decode_rep_string
+
+    day_name = date.strftime("%a")
     
     puts rep_codes.inspect
 
@@ -175,7 +235,7 @@ class Goal < ActiveRecord::Base
     puts st_time
     puts en_time
     
-    return Goal.new({:start => st_time, :end => en_time}) if st_time && en_time
+    return Goal.new({:start => st_time, :end => en_time, :id => cur_goal.id, :title => cur_goal.title, :description => cur_goal.description}) if st_time && en_time
   end
 
   def free_space_on?(date)
