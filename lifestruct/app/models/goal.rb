@@ -32,7 +32,7 @@ class Goal < ActiveRecord::Base
   def assign(properties)
     cur_goal = self
     if properties[:status] == "hard_code"
-      displaced_goals = free_time_between(cur_goal.start, cur_goal.end)
+      displaced_goals = Goal.free_time_between(cur_goal.start, cur_goal.end)
       goal_map = GoalMap.new
       goal_map.assign_attributes({goal_id: cur_goal.id,
                                   status_id: 2,
@@ -116,7 +116,7 @@ class Goal < ActiveRecord::Base
     cur_goal.save
   end
 
-  def free_time_between(start_time, end_time)
+  def self.free_time_between(start_time, end_time)
     selected_goals = GoalMap.all.map {|g_m| g_m.goal}.select do |g| 
       (((g.start >= start_time) && (g.end <= end_time)) || ((g.start >= start_time) && (g.start <= end_time)) || ((g.end >= start_time) && (g.end <= end_time)) || ((g.start < start_time) && (g.end > end_time))) && (!g.deadline.nil?)
     end
@@ -126,10 +126,81 @@ class Goal < ActiveRecord::Base
     selected_goals
   end
 
+  def make_proxy_for(date)
+    cur_goal = self
+    rep_codes = []
+    rep_stat = cur_goal.repeatable.to_s
+    day_name = date.strftime("%a")
+    rep_stat.each_char do |rep|
+      rep_codes.push(rep.to_i)
+    end
+    
+    puts rep_codes.inspect
+
+    code = 0
+
+    case day_name
+    when "Mon"
+      code = 1  
+    when "Tue"
+      code = 2
+    when "Wed"
+      code = 3
+    when "Thu"
+      code = 4
+    when "Fri"
+      code = 5
+    when "Sat"
+      code = 6
+    when "Sun"
+      code = 7
+    end
+    
+    puts code
+    st_time = nil
+    en_time = nil
+    puts rep_codes.include?(code)
+    if rep_codes.include?(code)
+      (cur_goal.start.to_datetime..(cur_goal.start.to_datetime + 7)).to_a.each_with_index do |dt, index|
+        puts dt
+        puts index
+        if dt.to_date == date
+          st_time = dt
+          en_time = (cur_goal.end.to_datetime + index) 
+          break
+        end
+      end
+    end
+
+    puts st_time
+    puts en_time
+    
+    return Goal.new({:start => st_time, :end => en_time}) if st_time && en_time
+  end
+
   def free_space_on?(date)
     cur_goal = self
     req_time = cur_goal.timetaken
-    goals = GoalMap.all.map {|g_m| g_m.goal }.select {|g|  (g.start.to_date..g.end.to_date).to_a.include?(date) }.sort_by {|g| g.start }
+    #goals = GoalMap.all.map {|g_m| g_m.goal }.select { |g|  (g.start.to_date..g.end.to_date).to_a.include?(date) }.sort_by {|g| g.start }
+    goals = []
+    GoalMap.all.map {|gm| gm.goal}.each do |goal|
+      if (goal.start.to_date..goal.end.to_date).to_a.include?(date)
+        goals.push(goal)
+      end
+      puts "STARTED MAKING PROXY FOR #{goal.title}!!!"
+      rep_goal = goal.make_proxy_for(date)
+      puts "PROXY MADE: #{rep_goal.start if rep_goal} #{rep_goal.end if rep_goal}!!"
+      puts "PROXY FINDING ENDED FOR #{goal.title}!!!"
+      if !rep_goal.nil?
+        if (rep_goal.start.to_date..rep_goal.end.to_date).to_a.include?(date)
+          goals.push(rep_goal)
+        end
+      end
+    end
+
+    goals.sort_by(&:start)
+
+
     puts goals.inspect
     index = 0
     goal_len = goals.length
@@ -164,7 +235,7 @@ class Goal < ActiveRecord::Base
     current_goal = self
     index = 0
     date_size = date_array.length
-    while (current_goal.number_of_siblings_on(date_array[index%date_size]) > current_goal.number_of_siblings_on(date_array[(index+1)%date_size]))
+    while (current_goal.number_of_siblings_on(date_array[index%date_size]) >= current_goal.number_of_siblings_on(date_array[(index+1)%date_size]))
       index += 1
     end
     date_array[index%date_size]

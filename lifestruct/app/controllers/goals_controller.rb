@@ -79,6 +79,10 @@ class GoalsController < ApplicationController
     redirect_to goals_path
   end
 
+  def freetime
+    redirect_to '/home'
+  end
+
   def stringify_date(year, month, day, hour, min)
     datetime = "#{year}-#{month}-#{day} #{hour}:#{min}"
   end

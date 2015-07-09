@@ -1,0 +1,6 @@
+<h3> Free time between: </h3>
+<%= bootstrap_form_for(:goal, url: '/goals/freetime', method: "get") do |f| %>
+  <%= f.datetime_select :starttime %>
+  <%= f.datetime_select :endtime %>
+  <%= f.submit "Free Time", class: 'btn btn-primary' %>
+<% end %>

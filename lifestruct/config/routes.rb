@@ -6,6 +6,7 @@ Lifestruct::Application.routes.draw do
   # root 'welcome#index'
   get 'goals/calendar'
   get 'goals/assign'
+  get 'goals/freetime'
   
   resource :home
   resources :goals

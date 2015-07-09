@@ -4,6 +4,7 @@
 $(document).ready ->
    $("#calendar").fullCalendar
      defaultView: 'agendaWeek'
+     allDaySlot: false
      header:
        left: 'prev,next today'
        center: 'title'
