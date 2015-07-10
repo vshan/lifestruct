@@ -101,12 +101,7 @@ class GoalsController < ApplicationController
     starttime = string_to_datetime(goal_params[:"starttime(1i)"], goal_params[:"starttime(2i)"], goal_params[:"starttime(3i)"], goal_params[:"starttime(4i)"], goal_params[:"starttime(5i)"])
     endtime =  string_to_datetime(goal_params[:"endtime(1i)"], goal_params[:"endtime(2i)"], goal_params[:"endtime(3i)"], goal_params[:"endtime(4i)"], goal_params[:"endtime(5i)"]) 
     displaced_goals = Goal.free_time_between(starttime, endtime)
-    displaced_goals.each {|goal| 
-      (endtime..goal.deadline).each do |date|
-        puts "DATE KA TOp KEEK : #{date}"
-      end   
-      goal.assign({status: "fluid", date_range: (endtime..goal.deadline)})
-    }
+    displaced_goals.each {|goal| goal.assign({status: "fluid", date_range: [endtime, goal.deadline.to_datetime]})}
     redirect_to '/home'
   end
 

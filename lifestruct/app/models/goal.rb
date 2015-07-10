@@ -19,17 +19,14 @@ class Goal < ActiveRecord::Base
   end
 
   def self.assign_goals
-    puts "STARTED ASSIGNING GOALS"
     leaf_goals = Goal.leaf_unassigned_goals
     leaf_goals.each do |goal|
       if goal.deadline.nil?
         goal.assign({status: "hard_code"})
       else
-        puts "STARTED ASSIGNING FLUID GOAL"
         goal.assign({status: "fluid"})
       end
     end
-    puts "ENDED ASSIGNING GOALS!!"
   end
 
   def assign(properties)
@@ -45,11 +42,9 @@ class Goal < ActiveRecord::Base
       displaced_goals.each {|goal| goal.assign({status: "fluid"})}
     elsif properties[:status] == "fluid"
       if properties[:date_range]
-        goal_start_time = cur_goal.find_start_time(properties[:date_range])
+        goal_start_time = cur_goal.find_start_time(*properties[:date_range])
       else
-        puts "NO DATE RANGE START TIME!!!"
-        goal_start_time = cur_goal.find_start_time
-        puts "FINISHED NO DATE RANGE TOP KEK!!!"
+        goal_start_time = cur_goal.find_start_time(DateTime.now, cur_goal.deadline.to_datetime)
       end
       goal_map = GoalMap.new
       goal_map.assign_attributes({goal_id: cur_goal.id,
@@ -74,46 +69,131 @@ class Goal < ActiveRecord::Base
     end
   end
 
-  def number_of_siblings_on(date)
+  def find_start_time(datet_start, datet_end)
+    current_goal = self
+    time_alloc = current_goal.timetaken
+    #date_array = (datet_start.to_date..datet_end.to_date).to_a
+
+    datet_array = (datet_start.to_datetime..datet_end.to_datetime).to_a
+    datet_len = datet_array.length
+
+    datet_slices = []
+
+    datet_array.each_with_index do |datet, index|
+      if index == (datet_len - 1)
+        datet_slices << [datet, datet_end]
+      else
+        datet_slices << [datet, datet_array[(index+1)%(datet_len)]]
+      end
+    end
+
+    puts "CHECKPOINT 1"
+    req_date = current_goal.find_suitable_date(datet_slices)
+    puts "CHECKPOINT 3"
+
+    @rel_goals = []
+
+    GoalMap.all.map {|gm| gm.goal}.each do |goal|
+      if (((goal.start >= datet_start) && (goal.end <= datet_end)) || ((goal.start >= datet_start) && (goal.start <= datet_end)) || ((goal.end >= datet_start) && (goal.end <= datet_end)) || ((goal.start < datet_start) && (goal.end > datet_end)))
+        @rel_goals << goal
+      end
+      if goal.repeatable
+        (datet_start.to_date..datet_end.to_date).to_a.uniq.each do |date|
+          rep_goal = goal.make_proxy_for(date)
+          @rel_goals << rep_goal if rep_goal
+        end
+      end
+    end
+
+    free_space_avail = current_goal.free_space_on?(*req_date)
+    unless free_space_avail[0]
+      if datet_slices.delete(req_date)
+        req_date = current_goal.find_suitable_date(datet_slices)
+        free_space_avail = current_goal.free_space_on?(*req_date)
+      else
+        swap_goal = GoalMap.all.map {|g_m| g_m.goal}.select {|g| date_array.contain?(g.start.to_date) && g.deadline > current_goal.deadline && g.timetaken >= time_alloc}.take(1)
+        start_time_goal = swap_goal.start
+        swap_goal.unassign_fluid_goal!
+        swap_goal.assign({status: "fluid", date_range: [current_goal.deadline, swap_goal.deadline]})
+        return start_time_goal
+      end
+    end
+    return free_space_avail[1]
+  end
+
+
+  def free_space_on?(datet_start, datet_end)
+    cur_goal = self
+    req_time = cur_goal.timetaken
+    #goals = GoalMap.all.map {|g_m| g_m.goal }.select { |g|  (g.start.to_date..g.end.to_date).to_a.include?(date) }.sort_by {|g| g.start }
+    # goals = []
+    # GoalMap.all.map {|gm| gm.goal}.each do |goal|
+    #   if (((g.start >= start_time) && (g.end <= end_time)) || ((g.start >= start_time) && (g.start <= end_time)) || ((g.end >= start_time) && (g.end <= end_time)) || ((g.start < start_time) && (g.end > end_time)))
+    #     goals.push(goal)
+    #   end
+    #   rep_goal = goal.make_proxy_for(date) if goal.repeatable
+    #   if !rep_goal.nil?
+    #     if (rep_goal.start.to_date..rep_goal.end.to_date).to_a.include?(date)
+    #       goals.push(rep_goal)
+    #     end
+    #   end
+    # end
+
+    goals = @rel_goals.select {|g| (((g.start >= datet_start) && (g.end <= datet_end)) || ((g.start >= datet_start) && (g.start <= datet_end)) || ((g.end >= datet_start) && (g.end <= datet_end)) || ((g.start < datet_start) && (g.end > datet_end)))}
+
+    goals = goals.sort_by(&:start)
+
+    index = 0
+    goal_len = goals.length
+    if goal_len == 0
+      return true, datet_start
+    elsif goal_len == 1
+      if (goals[0].end > datet_end)
+        return false, nil
+      else
+        return ((datet_end.to_time - goals[0].end.to_time)/60 >= req_time), goals[0].end
+      end
+    end
+
+    if ((goals[0].start).to_time - datet_start.to_time)/60 >= req_time
+      return true, datet_start
+    end
+      
+    while ((goals[index+1].start.to_time - goals[index].end.to_time)/60 < req_time )
+      if (index == (goal_len - 2))
+        if ((goals[index+1].end) > datet_end)
+          return false, nil
+        else
+          return ((datet_end.to_time - (goals[index+1].end).to_time)/60 >= req_time), goals[index+1].end
+        end
+      end
+      index += 1
+    end
+    return true, goals[index].end
+  end
+
+  def find_suitable_date(datet_slices)
+    current_goal = self
+    index = 0
+    date_size = datet_slices.length
+    puts "CHECKPOINT 2"
+    while (current_goal.number_of_siblings_on(*datet_slices[index%date_size]) > current_goal.number_of_siblings_on(*datet_slices[(index+1)%date_size]))
+      index += 1
+    end
+    datet_slices[index%date_size]
+  end
+
+
+  def number_of_siblings_on(datet_start, datet_end)
     cur_goal_paren = self.parent_id
     sibling_count = 0
-    goal_parens = GoalMap.all.map{|g_m| g_m.goal}.select {|g| g.start.to_date == date }.map {|g| g.parent_id}
+    goal_parens = GoalMap.all.map{|g_m| g_m.goal}.select {|g| ((g.start >= datet_start) && (g.start <= datet_end)) }.map {|g| g.parent_id}
     goal_parens.each do |paren|
       if paren == cur_goal_paren
         sibling_count += 1
       end
     end
     sibling_count
-  end
-
-  def find_start_time(date_arr = nil)
-    puts "STARTED FINDING TIME LEL!!!"
-    current_goal = self
-    time_alloc = current_goal.timetaken
-    if date_arr
-      date_array = date_arr.to_a
-    else
-      puts "NO TIME WAS GIVEN LEL!!!"
-      date_array = (Date.today..current_goal.deadline.to_date).to_a
-    end
-    puts "STARTED FINDING SUITABLE DATE!!!"
-    puts "CHECK THIS SHIT OUT!!! + #{date_arr.class}"
-    puts "THE DATE IT TOP LEL!!!! #{date_arr}"
-    req_date = current_goal.find_suitable_date(date_array)
-    free_space_avail = current_goal.free_space_on?(req_date)
-    unless free_space_avail[0]
-      if date_array.delete(req_date)
-        req_date = current_goal.find_suitable_date(date_array)
-        free_space_avail = current_goal.free_space_on?(req_date)
-      else
-        swap_goal = GoalMap.all.map {|g_m| g_m.goal}.select {|g| date_array.contain?(g.start.to_date) && g.deadline > current_goal.deadline && g.timetaken >= time_alloc}.take(1)
-        start_time_goal = swap_goal.start
-        swap_goal.unassign_fluid_goal!
-        swap_goal.assign({status: "fluid", date_range: (current_goal.deadline..swap_goal.deadline)})
-        return start_time_goal
-      end
-    end
-    return free_space_avail[1]
   end
 
   def unassign_fluid_goal!
@@ -201,11 +281,7 @@ class Goal < ActiveRecord::Base
   def make_proxy_for(date)
     cur_goal = self
     rep_codes = cur_goal.decode_rep_string
-
     day_name = date.strftime("%a")
-    
-    puts rep_codes.inspect
-
     code = 0
 
     case day_name
@@ -224,15 +300,11 @@ class Goal < ActiveRecord::Base
     when "Sun"
       code = 7
     end
-    
-    puts code
+
     st_time = nil
     en_time = nil
-    puts rep_codes.include?(code)
     if rep_codes.include?(code)
       (cur_goal.start.to_datetime..(cur_goal.start.to_datetime + 7)).to_a.each_with_index do |dt, index|
-        puts dt
-        puts index
         if dt.to_date == date
           st_time = dt
           en_time = (cur_goal.end.to_datetime + index) 
@@ -241,75 +313,8 @@ class Goal < ActiveRecord::Base
       end
     end
 
-    puts st_time
-    puts en_time
-    
     return Goal.new({:start => st_time, :end => en_time, :id => cur_goal.id, :title => cur_goal.title, :description => cur_goal.description}) if st_time && en_time
   end
 
-  def free_space_on?(date)
-    cur_goal = self
-    req_time = cur_goal.timetaken
-    #goals = GoalMap.all.map {|g_m| g_m.goal }.select { |g|  (g.start.to_date..g.end.to_date).to_a.include?(date) }.sort_by {|g| g.start }
-    goals = []
-    GoalMap.all.map {|gm| gm.goal}.each do |goal|
-      if (goal.start.to_date..goal.end.to_date).to_a.include?(date)
-        goals.push(goal)
-      end
-      puts "STARTED MAKING PROXY FOR #{goal.title}!!!"
-      rep_goal = goal.make_proxy_for(date)
-      puts "PROXY MADE: #{rep_goal.start if rep_goal} #{rep_goal.end if rep_goal}!!"
-      puts "PROXY FINDING ENDED FOR #{goal.title}!!!"
-      if !rep_goal.nil?
-        if (rep_goal.start.to_date..rep_goal.end.to_date).to_a.include?(date)
-          goals.push(rep_goal)
-        end
-      end
-    end
 
-    goals.sort_by(&:start)
-
-
-    puts goals.inspect
-    index = 0
-    goal_len = goals.length
-    if goal_len == 0
-      return true, date.to_datetime.change(offset: "+0530")
-    elsif goal_len == 1
-      if (goals[0].end > ((date + 1).to_datetime.change(offset: "+0530")))
-        return false, nil
-      else
-        return ((((date + 1).to_datetime.change(offset: "+0530")).to_time - (goals[0].end).to_time)/60 >= req_time), goals[0].end
-      end
-    end
-
-    if ((goals[0].start).to_time - (date).to_datetime.change(offset: "+0530").to_time)/60 >= req_time
-      return true, date.to_datetime.change(offset: "+0530")
-    end
-      
-    while ((goals[index+1].start.to_time - goals[index].end.to_time)/60 < req_time )
-      if (index == (goal_len - 2))
-        if ((goals[index+1].end) > ((date + 1).to_datetime.change(offset: "+0530")))
-          return false, nil
-        else
-          return ((((date + 1).to_datetime.change(offset: "+0530")).to_time - (goals[index+1].end).to_time)/60 >= req_time), goals[index+1].end
-        end
-      end
-      index += 1
-    end
-    return true, goals[index].end
-  end
-
-  def find_suitable_date(date_array)
-    puts "FINDING SUITABLE DATE LEL!!!"
-    puts "!!!! DATE IS #{date_array}!!!"
-    current_goal = self
-    index = 0
-    date_size = date_array.length
-    while (current_goal.number_of_siblings_on(date_array[index%date_size]) > current_goal.number_of_siblings_on(date_array[(index+1)%date_size]))
-      index += 1
-    end
-    puts "FOUND SUITABLE DATE LEL!!!"
-    date_array[index%date_size]
-  end
 end
