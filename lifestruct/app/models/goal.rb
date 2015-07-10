@@ -19,14 +19,17 @@ class Goal < ActiveRecord::Base
   end
 
   def self.assign_goals
+    puts "STARTED ASSIGNING GOALS"
     leaf_goals = Goal.leaf_unassigned_goals
     leaf_goals.each do |goal|
       if goal.deadline.nil?
         goal.assign({status: "hard_code"})
       else
+        puts "STARTED ASSIGNING FLUID GOAL"
         goal.assign({status: "fluid"})
       end
     end
+    puts "ENDED ASSIGNING GOALS!!"
   end
 
   def assign(properties)
@@ -44,7 +47,9 @@ class Goal < ActiveRecord::Base
       if properties[:date_range]
         goal_start_time = cur_goal.find_start_time(properties[:date_range])
       else
+        puts "NO DATE RANGE START TIME!!!"
         goal_start_time = cur_goal.find_start_time
+        puts "FINISHED NO DATE RANGE TOP KEK!!!"
       end
       goal_map = GoalMap.new
       goal_map.assign_attributes({goal_id: cur_goal.id,
@@ -82,14 +87,18 @@ class Goal < ActiveRecord::Base
   end
 
   def find_start_time(date_arr = nil)
+    puts "STARTED FINDING TIME LEL!!!"
     current_goal = self
     time_alloc = current_goal.timetaken
     if date_arr
       date_array = date_arr.to_a
     else
+      puts "NO TIME WAS GIVEN LEL!!!"
       date_array = (Date.today..current_goal.deadline.to_date).to_a
     end
-    
+    puts "STARTED FINDING SUITABLE DATE!!!"
+    puts "CHECK THIS SHIT OUT!!! + #{date_arr.class}"
+    puts "THE DATE IT TOP LEL!!!! #{date_arr}"
     req_date = current_goal.find_suitable_date(date_array)
     free_space_avail = current_goal.free_space_on?(req_date)
     unless free_space_avail[0]
@@ -292,12 +301,15 @@ class Goal < ActiveRecord::Base
   end
 
   def find_suitable_date(date_array)
+    puts "FINDING SUITABLE DATE LEL!!!"
+    puts "!!!! DATE IS #{date_array}!!!"
     current_goal = self
     index = 0
     date_size = date_array.length
-    while (current_goal.number_of_siblings_on(date_array[index%date_size]) >= current_goal.number_of_siblings_on(date_array[(index+1)%date_size]))
+    while (current_goal.number_of_siblings_on(date_array[index%date_size]) > current_goal.number_of_siblings_on(date_array[(index+1)%date_size]))
       index += 1
     end
+    puts "FOUND SUITABLE DATE LEL!!!"
     date_array[index%date_size]
   end
 end
