@@ -13,6 +13,20 @@ class GoalsController < ApplicationController
     Goal.assign_goals
     redirect_to '/home'   
   end
+
+  def destroy
+    @del_goal = Goal.find(params[:id])
+    @sub_goals = @del_goal.subgoals
+    @sub_goals.each do |subgoal|
+      if subgoal.goal_map
+        subgoal.goal_map.destroy
+      end
+      subgoal.destroy
+    end
+    @del_goal.goal_map.destroy if @del_goal.goal_map
+    @del_goal.destroy
+    redirect_to '/goals'
+  end
   
   def create
     #render text: params

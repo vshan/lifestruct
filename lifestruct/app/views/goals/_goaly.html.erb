@@ -22,7 +22,9 @@
       <i class="icon-chevron-down icon-white"></i>
     <% end %>
   <% end %>
-
+  <%= link_to "/goals/#{goal.id}", class: "btn btn-small btn-danger", method: :delete do %>
+      <i class="icon-remove icon-white"></i>
+    <% end %>
   <ul id="ul-parent-<%=goal.id %>"></ul>
   </div>
 </li>
