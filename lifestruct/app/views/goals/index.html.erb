@@ -2,6 +2,8 @@
 $(document).ready(function() {
   $("#repeat-stat-form").hide();
   $("#hardcode-time").hide();
+  $(".colorpicker").colorpicker();
+  $("#color-select-goal").hide();
 });
 $(document).on("click", ".add-goal-button", function(e) {
   var btnid = $(this).attr('id');
@@ -30,6 +32,14 @@ $(document).on("click", "#goal_hardcode_time", function(e) {
   }
 });
 
+$(document).on("click", "#goal_pick_color", function(e) {
+  var val_stat = $(this).is(":checked");
+  if (val_stat) {
+    $("#color-select-goal").show();
+  } else {
+    $("#color-select-goal").hide();
+  }
+});
 
 </script>
 
@@ -56,4 +66,3 @@ $(document).on("click", "#goal_hardcode_time", function(e) {
     </div>
   </div>
 </div>
-  

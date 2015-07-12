@@ -16,5 +16,6 @@
 //= require twitter/bootstrap
 //= require turbolinks
 //= require fullcalendar
+//= require bootstrap-colorpicker
 //= require_tree .
 

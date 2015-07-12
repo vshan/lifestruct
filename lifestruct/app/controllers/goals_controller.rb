@@ -5,8 +5,15 @@ class GoalsController < ApplicationController
     @root_goals = Goal.root_goals
   end
 
+  def new
+  end
+
   def show
     @goal = Goal.find(params[:id])
+  end
+
+  def edit
+    @goal = Goal.find(params[:id])    
   end
 
   def assign
@@ -29,8 +36,6 @@ class GoalsController < ApplicationController
   end
   
   def create
-    #render text: params
-    #return
     @new_goal = Goal.new
     title = goal_params[:title]
     description = goal_params[:description]
@@ -39,6 +44,9 @@ class GoalsController < ApplicationController
     endtime =  stringify_date(goal_params[:"endtime(1i)"], goal_params[:"endtime(2i)"], goal_params[:"endtime(3i)"], goal_params[:"endtime(4i)"], goal_params[:"endtime(5i)"]) 
     repeatable = goal_params[:repeatable].to_i
     hardcode_time = goal_params[:hardcode_time].to_i
+    pick_color = goal_params[:pick_color].to_i
+    background_color = goal_params[:background_color]
+    border_color = goal_params[:border_color]
     monday_stat = goal_params[:repeat1]
     tuesday_stat = goal_params[:repeat2]
     wednesday_stat = goal_params[:repeat3]
@@ -50,11 +58,22 @@ class GoalsController < ApplicationController
     all_stats = [monday_stat, tuesday_stat, wednesday_stat, thursday_stat, friday_stat, saturday_stat, sunday_stat, month_stat]
     parent_id = goal_params[:parent_id]
 
+    if pick_color == 0
+      background_color = nil
+      border_color = nil
+    end
+
     if parent_id.empty?
       parent_id = nil
     else
+      puts "TOP KEK MY FRIEND ;0"
       parent_id = parent_id.to_i
-      Goal.find(parent_id).update_attribute(:has_child, 1)
+      parent_goal = Goal.find(parent_id)
+      parent_goal.update_attribute(:has_child, 1)
+      if pick_color == 0
+        background_color = parent_goal.background_color
+        border_color = parent_goal.border_color
+      end
     end
 
     if hardcode_time == 1
@@ -83,7 +102,9 @@ class GoalsController < ApplicationController
        repeatable: repeat_stat,
        :end => endtime,
        parent_id: parent_id,
-       timetaken: time_alloc
+       timetaken: time_alloc,
+       background_color: background_color,
+       border_color: border_color
       })
     @new_goal.save
     unless @new_goal.timetaken
@@ -101,7 +122,7 @@ class GoalsController < ApplicationController
     starttime = string_to_datetime(goal_params[:"starttime(1i)"], goal_params[:"starttime(2i)"], goal_params[:"starttime(3i)"], goal_params[:"starttime(4i)"], goal_params[:"starttime(5i)"])
     endtime =  string_to_datetime(goal_params[:"endtime(1i)"], goal_params[:"endtime(2i)"], goal_params[:"endtime(3i)"], goal_params[:"endtime(4i)"], goal_params[:"endtime(5i)"]) 
     displaced_goals = Goal.free_time_between(starttime, endtime)
-    displaced_goals.each {|goal| goal.assign({status: "fluid", date_range: [endtime, goal.deadline.to_datetime]})}
+    displaced_goals.each {|goal| goal.assign({status: Goal.FLUID, date_range: [endtime, goal.deadline.to_datetime]})}
     redirect_to '/home'
   end
 
@@ -155,7 +176,7 @@ class GoalsController < ApplicationController
   private
 
   def goal_params
-    params.require(:goal).permit(:allocate_minutes, :title, :description, :"deadline(1i)", :"deadline(2i)", :"deadline(3i)", :"deadline(4i)", :"deadline(5i)", :"starttime(1i)", :"starttime(2i)", :"starttime(3i)", :"starttime(4i)", :"starttime(5i)", :"endtime(1i)", :"endtime(2i)", :"endtime(3i)", :"endtime(4i)", :"endtime(5i)", :repeatable, :hardcode_time, :repeat1, :repeat2, :repeat3, :repeat4, :repeat5, :repeat6, :repeat7, :repeat8, :deadline, :parent_id)
+    params.require(:goal).permit(:pick_color, :border_color, :background_color, :allocate_minutes, :title, :description, :"deadline(1i)", :"deadline(2i)", :"deadline(3i)", :"deadline(4i)", :"deadline(5i)", :"starttime(1i)", :"starttime(2i)", :"starttime(3i)", :"starttime(4i)", :"starttime(5i)", :"endtime(1i)", :"endtime(2i)", :"endtime(3i)", :"endtime(4i)", :"endtime(5i)", :repeatable, :hardcode_time, :repeat1, :repeat2, :repeat3, :repeat4, :repeat5, :repeat6, :repeat7, :repeat8, :deadline, :parent_id)
   end
 
 end

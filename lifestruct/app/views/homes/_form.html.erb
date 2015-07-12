@@ -1,7 +1,12 @@
 <%= bootstrap_form_for(:goal, url: goals_path) do |f| %>
   <%= f.text_field :title, class: 'span4' %>
   <%= f.text_area :description, class: 'span4', :cols => "20", :rows => "6", placeholder: "Describe the goal..." %>
-  <%= f.check_box :repeatable? %>
+  <%= f.check_box :pick_color, label: "Pick Color (uncheck for default/inherit from parent)"%>
+  <div id="color-select-goal">
+    <%= f.text_field :background_color, class: "colorpicker" %>
+    <%= f.text_field :border_color, class: "colorpicker" %>
+  </div>
+  <%= f.check_box :repeatable, label: "Goal Repeats" %>
   <div id="repeat-stat-form" style="margin-left: 20px; padding-bottom: 10px; padding-top: 10px;">
   <%= f.form_group :repeatstat, label: { text: "Repeats every..." } do %>
     <%= f.check_box :repeat1 do %>
@@ -30,7 +35,7 @@
     <% end %>
   <% end %>
   </div>
-  <%= f.check_box :hardcode_time? %>
+  <%= f.check_box :hardcode_time, label: "Manually Set Time" %>
   <div id="hardcode-time">
     <%= f.datetime_select :starttime %>
     <%= f.datetime_select :endtime %>

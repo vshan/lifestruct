@@ -6,6 +6,15 @@ class Goal < ActiveRecord::Base
 
   has_one :goal_map
 
+  attr_accessor :pick_color, :repeat1, :repeat2, :repeat3, :repeat4, :repeat5, :repeat6, :repeat7, :repeat8, :hardcode_time, :starttime, :endtime, :allocate_minutes
+
+  @FLUID = "fluid"
+  @FIXED = "hard_code"
+
+  class << self
+    attr_reader :FLUID, :FIXED
+  end
+
   def self.root_goals
     Goal.where(parent_id: nil)
   end
@@ -22,9 +31,9 @@ class Goal < ActiveRecord::Base
     leaf_goals = Goal.leaf_unassigned_goals
     leaf_goals.each do |goal|
       if goal.deadline.nil?
-        goal.assign({status: "hard_code"})
+        goal.assign(status: Goal.FIXED)
       else
-        goal.assign({status: "fluid"})
+        goal.assign(status: Goal.FLUID)
       end
     end
   end
@@ -114,7 +123,7 @@ class Goal < ActiveRecord::Base
         swap_goal = GoalMap.all.map {|g_m| g_m.goal}.select {|g| date_array.contain?(g.start.to_date) && g.deadline > current_goal.deadline && g.timetaken >= time_alloc}.take(1)
         start_time_goal = swap_goal.start
         swap_goal.unassign_fluid_goal!
-        swap_goal.assign({status: "fluid", date_range: [current_goal.deadline, swap_goal.deadline]})
+        swap_goal.assign({status: Goal.FLUID, date_range: [current_goal.deadline, swap_goal.deadline]})
         return start_time_goal
       end
     end
@@ -125,19 +134,6 @@ class Goal < ActiveRecord::Base
   def free_space_on?(datet_start, datet_end)
     cur_goal = self
     req_time = cur_goal.timetaken
-    #goals = GoalMap.all.map {|g_m| g_m.goal }.select { |g|  (g.start.to_date..g.end.to_date).to_a.include?(date) }.sort_by {|g| g.start }
-    # goals = []
-    # GoalMap.all.map {|gm| gm.goal}.each do |goal|
-    #   if (((g.start >= start_time) && (g.end <= end_time)) || ((g.start >= start_time) && (g.start <= end_time)) || ((g.end >= start_time) && (g.end <= end_time)) || ((g.start < start_time) && (g.end > end_time)))
-    #     goals.push(goal)
-    #   end
-    #   rep_goal = goal.make_proxy_for(date) if goal.repeatable
-    #   if !rep_goal.nil?
-    #     if (rep_goal.start.to_date..rep_goal.end.to_date).to_a.include?(date)
-    #       goals.push(rep_goal)
-    #     end
-    #   end
-    # end
 
     goals = @rel_goals.select {|g| (((g.start >= datet_start) && (g.end <= datet_end)) || ((g.start >= datet_start) && (g.start <= datet_end)) || ((g.end >= datet_start) && (g.end <= datet_end)) || ((g.start < datet_start) && (g.end > datet_end)))}
 
@@ -225,43 +221,43 @@ class Goal < ActiveRecord::Base
         if rep_codes.include?(1)
           start_time = (cur_goal.start.to_datetime + (date - cur_goal.start.to_date).to_i)
           end_time = (cur_goal.end.to_datetime + (date - cur_goal.end.to_date).to_i)
-          goals << Goal.new({id: cur_goal.id, title: cur_goal.title, description: cur_goal.description, start: start_time, :end => end_time})
+          goals << Goal.new({id: cur_goal.id, title: cur_goal.title, description: cur_goal.description, start: start_time, :end => end_time, background_color: cur_goal.background_color, border_color: cur_goal.border_color})
         end
       when "Tue"
         if rep_codes.include?(2)
           start_time = (cur_goal.start.to_datetime + (date - cur_goal.start.to_date).to_i)
           end_time = (cur_goal.end.to_datetime + (date - cur_goal.end.to_date).to_i)
-          goals << Goal.new({id: cur_goal.id, title: cur_goal.title, description: cur_goal.description, start: start_time, :end => end_time})
+          goals << Goal.new({id: cur_goal.id, title: cur_goal.title, description: cur_goal.description, start: start_time, :end => end_time, background_color: cur_goal.background_color, border_color: cur_goal.border_color})
         end
       when "Wed"
         if rep_codes.include?(3)
           start_time = (cur_goal.start.to_datetime + (date - cur_goal.start.to_date).to_i)
           end_time = (cur_goal.end.to_datetime + (date - cur_goal.end.to_date).to_i)
-          goals << Goal.new({id: cur_goal.id, title: cur_goal.title, description: cur_goal.description, start: start_time, :end => end_time})
+          goals << Goal.new({id: cur_goal.id, title: cur_goal.title, description: cur_goal.description, start: start_time, :end => end_time, background_color: cur_goal.background_color, border_color: cur_goal.border_color})
         end
       when "Thu"
         if rep_codes.include?(4)
           start_time = (cur_goal.start.to_datetime + (date - cur_goal.start.to_date).to_i)
           end_time = (cur_goal.end.to_datetime + (date - cur_goal.end.to_date).to_i)
-          goals << Goal.new({id: cur_goal.id, title: cur_goal.title, description: cur_goal.description, start: start_time, :end => end_time})
+          goals << Goal.new({id: cur_goal.id, title: cur_goal.title, description: cur_goal.description, start: start_time, :end => end_time, background_color: cur_goal.background_color, border_color: cur_goal.border_color})
         end
       when "Fri"
         if rep_codes.include?(5)
           start_time = (cur_goal.start.to_datetime + (date - cur_goal.start.to_date).to_i)
           end_time = (cur_goal.end.to_datetime + (date - cur_goal.end.to_date).to_i)
-          goals << Goal.new({id: cur_goal.id, title: cur_goal.title, description: cur_goal.description, start: start_time, :end => end_time})
+          goals << Goal.new({id: cur_goal.id, title: cur_goal.title, description: cur_goal.description, start: start_time, :end => end_time, background_color: cur_goal.background_color, border_color: cur_goal.border_color})
         end
       when "Sat"
         if rep_codes.include?(6)
           start_time = (cur_goal.start.to_datetime + (date - cur_goal.start.to_date).to_i)
           end_time = (cur_goal.end.to_datetime + (date - cur_goal.end.to_date).to_i)
-          goals << Goal.new({id: cur_goal.id, title: cur_goal.title, description: cur_goal.description, start: start_time, :end => end_time})
+          goals << Goal.new({id: cur_goal.id, title: cur_goal.title, description: cur_goal.description, start: start_time, :end => end_time, background_color: cur_goal.background_color, border_color: cur_goal.border_color})
         end
       when "Sun"
         if rep_codes.include?(7)
           start_time = (cur_goal.start.to_datetime + (date - cur_goal.start.to_date).to_i)
           end_time = (cur_goal.end.to_datetime + (date - cur_goal.end.to_date).to_i)
-          goals << Goal.new({id: cur_goal.id, title: cur_goal.title, description: cur_goal.description, start: start_time, :end => end_time})
+          goals << Goal.new({id: cur_goal.id, title: cur_goal.title, description: cur_goal.description, start: start_time, :end => end_time, background_color: cur_goal.background_color, border_color: cur_goal.border_color})
         end
       end
     end
@@ -278,41 +274,26 @@ class Goal < ActiveRecord::Base
     rep_codes
   end
 
+  def decode_to_string(arr)
+    hash_decode = {1 => "Mon",
+                   2 => "Tue",
+                   3 => "Wed",
+                   4 => "Thu",
+                   5 => "Fri",
+                   6 => "Sat",
+                   7 => "Sun",
+                   8 => "Month"}
+    arr.map {|d| hash_decode[d]}
+  end
+
   def make_proxy_for(date)
     cur_goal = self
     rep_codes = cur_goal.decode_rep_string
     day_name = date.strftime("%a")
-    code = 0
-
-    case day_name
-    when "Mon"
-      code = 1  
-    when "Tue"
-      code = 2
-    when "Wed"
-      code = 3
-    when "Thu"
-      code = 4
-    when "Fri"
-      code = 5
-    when "Sat"
-      code = 6
-    when "Sun"
-      code = 7
+    if decode_to_string(rep_codes).include?(day_name)
+      st_time = cur_goal.start.to_datetime.change(day: date.day)
+      en_time = (st_time.to_time + (cur_goal.timetaken)*60).to_datetime
     end
-
-    st_time = nil
-    en_time = nil
-    if rep_codes.include?(code)
-      (cur_goal.start.to_datetime..(cur_goal.start.to_datetime + 7)).to_a.each_with_index do |dt, index|
-        if dt.to_date == date
-          st_time = dt
-          en_time = (cur_goal.end.to_datetime + index) 
-          break
-        end
-      end
-    end
-
     return Goal.new({:start => st_time, :end => en_time, :id => cur_goal.id, :title => cur_goal.title, :description => cur_goal.description}) if st_time && en_time
   end
 

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150703072047) do
+ActiveRecord::Schema.define(version: 20150712103615) do
 
   create_table "goal_logs", force: true do |t|
     t.string   "title"
@@ -47,6 +47,8 @@ ActiveRecord::Schema.define(version: 20150703072047) do
     t.datetime "end"
     t.integer  "has_child"
     t.integer  "prop"
+    t.string   "background_color"
+    t.string   "border_color"
   end
 
   add_index "goals", ["parent_id"], name: "index_goals_on_parent_id", using: :btree
