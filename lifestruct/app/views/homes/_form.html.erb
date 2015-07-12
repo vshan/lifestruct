@@ -37,12 +37,12 @@
   </div>
   <%= f.check_box :hardcode_time, label: "Manually Set Time" %>
   <div id="hardcode-time">
-    <%= f.datetime_select :starttime %>
-    <%= f.datetime_select :endtime %>
+    <%= f.text_field :start, placeholder: "#{Time.now}" %>
+    <%= f.text_field :end, placeholder: "#{Time.now + (60*60)}" %>
   </div>
   <div id="deadline-select-div">
-    <%= f.number_field :allocate_minutes %>
-    <%= f.datetime_select :deadline %>
+    <%= f.number_field :timetaken, placeholder: "0" %>
+    <%= f.text_field :deadline, placeholder: "#{Time.now}" %>
   </div>
   <%= f.hidden_field :parent_id %>
   <%= f.submit "Create", class: 'btn btn-primary', style: 'float: right;' %>

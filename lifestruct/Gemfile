@@ -18,6 +18,7 @@ gem "twitter-bootstrap-rails"
 gem 'bootstrap_form'
 gem 'bootstrap-colorpicker-rails'
 gem 'chronic'
+gem 'jquery-turbolinks'
 
 
 # Use CoffeeScript for .js.coffee assets and views
