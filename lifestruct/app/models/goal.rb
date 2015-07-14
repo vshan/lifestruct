@@ -40,7 +40,7 @@ class Goal < ActiveRecord::Base
 
   def assign(properties)
     cur_goal = self
-    if properties[:status] == "hard_code"
+    if properties[:status] == Goal.FIXED
       displaced_goals = Goal.free_time_between(cur_goal.start, cur_goal.end)
       goal_map = GoalMap.new
       goal_map.assign_attributes({goal_id: cur_goal.id,
@@ -48,8 +48,8 @@ class Goal < ActiveRecord::Base
                                   in_week: cur_goal.in_week?})
       goal_map.save
       cur_goal.update_attribute(:prop, 1)
-      displaced_goals.each {|goal| goal.assign({status: "fluid"})}
-    elsif properties[:status] == "fluid"
+      displaced_goals.each {|goal| goal.assign(status: Goal.FLUID)}
+    elsif properties[:status] == Goal.FLUID
       if properties[:date_range]
         goal_start_time = cur_goal.find_start_time(*properties[:date_range])
       else
@@ -81,8 +81,6 @@ class Goal < ActiveRecord::Base
   def find_start_time(datet_start, datet_end)
     current_goal = self
     time_alloc = current_goal.timetaken
-    #date_array = (datet_start.to_date..datet_end.to_date).to_a
-
     datet_array = (datet_start.to_datetime..datet_end.to_datetime).to_a
     datet_len = datet_array.length
 
@@ -95,11 +93,8 @@ class Goal < ActiveRecord::Base
         datet_slices << [datet, datet_array[(index+1)%(datet_len)]]
       end
     end
-
-    puts "CHECKPOINT 1"
+    
     req_date = current_goal.find_suitable_date(datet_slices)
-    puts "CHECKPOINT 3"
-
     @rel_goals = []
 
     GoalMap.all.map {|gm| gm.goal}.each do |goal|
@@ -141,18 +136,19 @@ class Goal < ActiveRecord::Base
 
     index = 0
     goal_len = goals.length
-    if goal_len == 0
+    
+    return true, datet_start if goal_len == 0
+
+    if ((goals[0].start).to_time - datet_start.to_time)/60 >= req_time
       return true, datet_start
-    elsif goal_len == 1
+    end
+
+    if goal_len == 1
       if (goals[0].end > datet_end)
         return false, nil
       else
         return ((datet_end.to_time - goals[0].end.to_time)/60 >= req_time), goals[0].end
       end
-    end
-
-    if ((goals[0].start).to_time - datet_start.to_time)/60 >= req_time
-      return true, datet_start
     end
       
     while ((goals[index+1].start.to_time - goals[index].end.to_time)/60 < req_time )
@@ -170,20 +166,17 @@ class Goal < ActiveRecord::Base
 
   def find_suitable_date(datet_slices)
     current_goal = self
-    index = 0
     date_size = datet_slices.length
-    puts "CHECKPOINT 2"
-    while (current_goal.number_of_siblings_on(*datet_slices[index%date_size]) > current_goal.number_of_siblings_on(*datet_slices[(index+1)%date_size]))
-      index += 1
-    end
-    datet_slices[index%date_size]
+    sorted_date_slices = datet_slices.sort_by { |date_slice| current_goal.number_of_siblings_on(*date_slice) }
+    smallest_slice = current_goal.number_of_siblings_on(*(sorted_date_slices.first))
+    sorted_date_slices.select {|ds| current_goal.number_of_siblings_on(*ds) == smallest_slice}.sort_by {|date_slice| date_slice[0]}.first
   end
 
 
   def number_of_siblings_on(datet_start, datet_end)
     cur_goal_paren = self.parent_id
     sibling_count = 0
-    goal_parens = GoalMap.all.map{|g_m| g_m.goal}.select {|g| ((g.start >= datet_start) && (g.start <= datet_end)) }.map {|g| g.parent_id}
+    goal_parens = GoalMap.all.map{|g_m| g_m.goal}.select {|g| (((g.start >= datet_start) && (g.end <= datet_end)) || ((g.start >= datet_start) && (g.start <= datet_end)) || ((g.end >= datet_start) && (g.end <= datet_end)) || ((g.start < datet_start) && (g.end > datet_end))) }.map {|g| g.parent_id}
     goal_parens.each do |paren|
       if paren == cur_goal_paren
         sibling_count += 1
@@ -296,6 +289,4 @@ class Goal < ActiveRecord::Base
     end
     return Goal.new({:start => st_time, :end => en_time, :id => cur_goal.id, :title => cur_goal.title, :description => cur_goal.description}) if st_time && en_time
   end
-
-
 end
