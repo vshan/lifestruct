@@ -1,6 +1,6 @@
 <h3> Free time between: </h3>
-<%= bootstrap_form_for(:goal, url: '/goals/freetime', method: "get") do |f| %>
-  <%= f.datetime_select :starttime %>
-  <%= f.datetime_select :endtime %>
+<%= bootstrap_form_for(:goal, url: '/goals/freetime', method: "get", layout: :inline) do |f| %>
+  <%= f.text_field :starttime, label: "Start", style: "margin: 10px;", placeholder: "now" %>
+  <%= f.text_field :endtime, label: "End", style: "margin: 10px;", placeholder: "2 hours from now" %>
   <%= f.submit "Free Time", class: 'btn btn-primary' %>
 <% end %>

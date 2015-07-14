@@ -16,9 +16,21 @@ class GoalsController < ApplicationController
     @goal = Goal.find(params[:id])    
   end
 
+  def update
+    respond_to do |format|
+      if @goal.update(goal_params)
+        format.html { redirect_to @post, notice: 'Post was successfully updated.' }
+        format.json { head :no_content }
+      else
+        format.html { render action: 'edit' }
+        format.json { render json: @post.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+
   def assign
     Goal.assign_goals
-    redirect_to '/home'   
+    redirect_to '/home', notice: "All unassigned goals have been successfully assigned."   
   end
 
   def destroy
@@ -32,7 +44,7 @@ class GoalsController < ApplicationController
     end
     @del_goal.goal_map.destroy if @del_goal.goal_map
     @del_goal.destroy
-    redirect_to '/goals'
+    redirect_to '/goals', notice: "successfully deleted."
   end
 
   def parse_datetime(str)
@@ -75,7 +87,6 @@ class GoalsController < ApplicationController
     if parent_id.empty?
       parent_id = nil
     else
-      puts "TOP KEK MY FRIEND ;0"
       parent_id = parent_id.to_i
       parent_goal = Goal.find(parent_id)
       parent_goal.update_attribute(:has_child, 1)
@@ -128,8 +139,10 @@ class GoalsController < ApplicationController
   end
 
   def freetime
-    starttime = string_to_datetime(goal_params[:"starttime(1i)"], goal_params[:"starttime(2i)"], goal_params[:"starttime(3i)"], goal_params[:"starttime(4i)"], goal_params[:"starttime(5i)"])
-    endtime =  string_to_datetime(goal_params[:"endtime(1i)"], goal_params[:"endtime(2i)"], goal_params[:"endtime(3i)"], goal_params[:"endtime(4i)"], goal_params[:"endtime(5i)"]) 
+    #starttime = string_to_datetime(goal_params[:"starttime(1i)"], goal_params[:"starttime(2i)"], goal_params[:"starttime(3i)"], goal_params[:"starttime(4i)"], goal_params[:"starttime(5i)"])
+    #endtime =  string_to_datetime(goal_params[:"endtime(1i)"], goal_params[:"endtime(2i)"], goal_params[:"endtime(3i)"], goal_params[:"endtime(4i)"], goal_params[:"endtime(5i)"]) 
+    starttime = parse_datetime(goal_params[:starttime]).to_datetime
+    endtime = parse_datetime(goal_params[:endtime]).to_datetime
     displaced_goals = Goal.free_time_between(starttime, endtime)
     displaced_goals.each {|goal| goal.assign({status: Goal.FLUID, date_range: [endtime, goal.deadline.to_datetime]})}
     redirect_to '/home'
@@ -185,7 +198,7 @@ class GoalsController < ApplicationController
   private
 
   def goal_params
-    params.require(:goal).permit(:start, :end, :timetaken, :deadline, :pick_color, :border_color, :background_color, :allocate_minutes, :title, :description, :"deadline(1i)", :"deadline(2i)", :"deadline(3i)", :"deadline(4i)", :"deadline(5i)", :"starttime(1i)", :"starttime(2i)", :"starttime(3i)", :"starttime(4i)", :"starttime(5i)", :"endtime(1i)", :"endtime(2i)", :"endtime(3i)", :"endtime(4i)", :"endtime(5i)", :repeatable, :hardcode_time, :repeat1, :repeat2, :repeat3, :repeat4, :repeat5, :repeat6, :repeat7, :repeat8, :deadline, :parent_id)
+    params.require(:goal).permit(:start, :starttime, :endtime, :end, :timetaken, :deadline, :pick_color, :border_color, :background_color, :allocate_minutes, :title, :description, :"deadline(1i)", :"deadline(2i)", :"deadline(3i)", :"deadline(4i)", :"deadline(5i)", :"starttime(1i)", :"starttime(2i)", :"starttime(3i)", :"starttime(4i)", :"starttime(5i)", :"endtime(1i)", :"endtime(2i)", :"endtime(3i)", :"endtime(4i)", :"endtime(5i)", :repeatable, :hardcode_time, :repeat1, :repeat2, :repeat3, :repeat4, :repeat5, :repeat6, :repeat7, :repeat8, :deadline, :parent_id)
   end
 
 end

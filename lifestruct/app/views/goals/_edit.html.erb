@@ -1,4 +1,4 @@
-<%= bootstrap_form_for(:goal, url: goals_path) do |f| %>
+<%= bootstrap_form_for(:goal, url: goal_path, method: :patch) do |f| %>
   <%= f.text_field :title, class: 'span4' %>
   <%= f.text_area :description, class: 'span4', :cols => "20", :rows => "6", placeholder: "Describe the goal..." %>
   <%= f.check_box :pick_color, label: "Pick Color (uncheck for default/inherit from parent)"%>
@@ -6,7 +6,7 @@
     <%= f.text_field :background_color, class: "colorpicker" %>
     <%= f.text_field :border_color, class: "colorpicker" %>
   </div>
-  <%= f.check_box :repeatable, label: "Goal Repeats" %>
+  <%= f.check_box :repeat, label: "Goal Repeats" %>
   <div id="repeat-stat-form" style="margin-left: 20px; padding-bottom: 10px; padding-top: 10px;">
   <%= f.form_group :repeatstat, label: { text: "Repeats every..." } do %>
     <%= f.check_box :repeat1 do %>
@@ -37,13 +37,13 @@
   </div>
   <%= f.check_box :hardcode_time, label: "Manually Set Time" %>
   <div id="hardcode-time">
-    <%= f.text_field :start, placeholder: "2 pm" %>
-    <%= f.text_field :end, placeholder: "5 pm" %>
+    <%= f.text_field :start, placeholder: "#{Time.now}" %>
+    <%= f.text_field :end, placeholder: "#{Time.now + (60*60)}" %>
   </div>
   <div id="deadline-select-div">
-    <%= f.number_field :timetaken, label: "Allocate time (in minutes)", placeholder: "0" %>
-    <%= f.text_field :deadline, placeholder: "10 days from now" %>
+    <%= f.number_field :timetaken, placeholder: "0" %>
+    <%= f.text_field :deadline, placeholder: "#{Time.now}" %>
   </div>
   <%= f.hidden_field :parent_id %>
-  <%= f.submit "Create", class: 'btn btn-primary', style: 'float: right;' %>
+  <%= f.submit class: 'btn btn-primary', style: 'float: right;' %>
 <% end %>

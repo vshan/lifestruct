@@ -12,7 +12,7 @@ $(document).on("click", ".add-goal-button", function(e) {
   console.log(parent_id);
 });
 
-$(document).on("click", "#goal_repeatable", function(e) {
+$(document).on("click", "#goal_repeat", function(e) {
   var val_stat = $(this).is(":checked");
   if (val_stat) {
     $("#repeat-stat-form").show();
@@ -45,4 +45,4 @@ $(document).on("click", "#goal_pick_color", function(e) {
 
 
 <h2> Editing </h2>
-<%= render 'homes/form' %>
+<%= render 'edit' %>
