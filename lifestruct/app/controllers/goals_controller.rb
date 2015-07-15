@@ -162,7 +162,7 @@ class GoalsController < ApplicationController
       goal.end = DateTime.parse(params[:end]).change(offset: "+0530")
       goal.save
     end
-    redirect_to root_path
+    redirect_to home_path
   end
 
   def string_to_datetime(year, month, day, hour, min)
