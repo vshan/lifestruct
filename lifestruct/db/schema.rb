@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150712103615) do
+ActiveRecord::Schema.define(version: 20150715061743) do
 
   create_table "goal_logs", force: true do |t|
     t.string   "title"
@@ -30,6 +30,7 @@ ActiveRecord::Schema.define(version: 20150712103615) do
     t.integer  "in_week"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "blacklist"
   end
 
   create_table "goals", force: true do |t|

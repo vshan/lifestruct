@@ -108,7 +108,9 @@ class Goal < ActiveRecord::Base
         @rel_goals << goal
       end
       if goal.repeatable
+        bdates = goal.blacklisted_dates
         (datet_start.to_date..datet_end.to_date).to_a.uniq.each do |date|
+          next if bdates.include?(date)
           rep_goal = goal.make_proxy_for(date)
           @rel_goals << rep_goal if rep_goal
         end
@@ -215,15 +217,27 @@ class Goal < ActiveRecord::Base
     if rep_codes.include?(code)
       start_time = (cur_goal.start.to_datetime + (date - cur_goal.start.to_date).to_i)
       end_time = (cur_goal.end.to_datetime + (date - cur_goal.end.to_date).to_i)
-      return Goal.new({id: cur_goal.id, title: cur_goal.title, description: cur_goal.description, start: start_time, :end => end_time, background_color: cur_goal.background_color, border_color: cur_goal.border_color})
+      return Goal.new({id: cur_goal.id, title: cur_goal.title, description: cur_goal.description, start: start_time, :end => end_time, background_color: cur_goal.background_color, border_color: cur_goal.border_color, repeatable: cur_goal.repeatable})
     end
+  end
+
+  def blacklisted_dates
+    cur_goal = self
+    if cur_goal.goal_map.blacklist
+      bdates = cur_goal.goal_map.blacklist.split.map{ |d| Goal.find(d).start.to_date }
+    else
+      bdates = []
+    end
+    bdates
   end
 
   def all_reps_in_bw(start_date, fin_date)
     goals = []
     cur_goal = self
     rep_codes = cur_goal.decode_rep_string
+    bdates = cur_goal.blacklisted_dates
     (start_date..fin_date).each do |date|
+      next if bdates.include?(date)
       copy_goal = cur_goal.goal_copy_for(Goal.DAY_MAP.invert[date.strftime("%a")], rep_codes, date)
       goals << copy_goal if copy_goal
     end

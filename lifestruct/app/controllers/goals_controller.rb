@@ -134,6 +134,37 @@ class GoalsController < ApplicationController
     redirect_to goals_path
   end
 
+  def changegoaltime
+    goal = Goal.find(params[:id])
+    if params[:set_new] == "true"
+      startt = DateTime.parse(params[:start]).change(offset: "+0530")
+      endt = DateTime.parse(params[:end]).change(offset: "+0530")  
+      @goal = Goal.new({title: goal.title,
+                        description: goal.description,
+                        deadline: goal.deadline,
+                        start: startt,
+                        :end => endt,
+                        parent_id: goal.parent_id,
+                        timetaken: ((endt.to_time - startt.to_time)/60),
+                        background_color: goal.background_color,
+                        border_color: goal.border_color
+                      })
+      @goal.save
+      @goal.assign(status: Goal.FIXED)
+      if goal.goal_map.blacklist
+        goal.goal_map.blacklist = goal.goal_map.blacklist + " " + @goal.id.to_s
+      else
+        goal.goal_map.blacklist = @goal.id.to_s
+      end
+      goal.goal_map.save
+    else
+      goal.start = DateTime.parse(params[:start]).change(offset: "+0530")
+      goal.end = DateTime.parse(params[:end]).change(offset: "+0530")
+      goal.save
+    end
+    redirect_to root_path
+  end
+
   def string_to_datetime(year, month, day, hour, min)
     DateTime.new(year.to_i, month.to_i, day.to_i, hour.to_i, min.to_i).change(offset: "+0530")
   end

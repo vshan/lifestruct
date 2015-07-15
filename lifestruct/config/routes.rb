@@ -8,6 +8,7 @@ Lifestruct::Application.routes.draw do
   get 'goals/assign'
   get 'goals/freetime'
   
+  post 'goals/changegoaltime'
   resource :home
   resources :goals
   root 'homes#show'
