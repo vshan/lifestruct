@@ -6,6 +6,8 @@ class Goal < ActiveRecord::Base
 
   has_one :goal_map
 
+  validates :title, presence: true
+
   @FLUID = "Fluid"
   @FIXED = "Fixed"
   @DAY_MAP = { 1 => "Mon",
