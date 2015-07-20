@@ -11,8 +11,8 @@ $(document).ready ->
       right: 'month,agendaWeek,agendaDay'
     firstDay: 1
     businessHours:
-      start: '10:00'
-      end: '18:00'
+      start: '07:55'
+      end: '17:00'
       dow: [1,2,3,4,5]
     events: '/goals/calendar.json'
     editable: true

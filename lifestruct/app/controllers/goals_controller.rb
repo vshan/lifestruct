@@ -17,15 +17,96 @@ class GoalsController < ApplicationController
   end
 
   def update
-    respond_to do |format|
-      if @goal.update(goal_params)
-        format.html { redirect_to @post, notice: 'Post was successfully updated.' }
-        format.json { head :no_content }
-      else
-        format.html { render action: 'edit' }
-        format.json { render json: @post.errors, status: :unprocessable_entity }
+    @new_goal = Goal.find(params[:id])
+    title = goal_params[:title]
+    description = goal_params[:description]
+    #deadline = stringify_date(goal_params[:"deadline(1i)"], goal_params[:"deadline(2i)"], goal_params[:"deadline(3i)"], goal_params[:"deadline(4i)"], goal_params[:"deadline(5i)"])
+    #starttime = stringify_date(goal_params[:"starttime(1i)"], goal_params[:"starttime(2i)"], goal_params[:"starttime(3i)"], goal_params[:"starttime(4i)"], goal_params[:"starttime(5i)"])
+    #endtime =  stringify_date(goal_params[:"endtime(1i)"], goal_params[:"endtime(2i)"], goal_params[:"endtime(3i)"], goal_params[:"endtime(4i)"], goal_params[:"endtime(5i)"]) 
+    
+    deadline = parse_datetime(goal_params[:deadline])
+    starttime = parse_datetime(goal_params[:start])
+    endtime = parse_datetime(goal_params[:end])
+
+    repeatable = goal_params[:repeatable].to_i
+    hardcode_time = goal_params[:hardcode_time].to_i
+    pick_color = goal_params[:pick_color].to_i
+    background_color = goal_params[:background_color]
+    border_color = goal_params[:border_color]
+    monday_stat = goal_params[:repeat1]
+    tuesday_stat = goal_params[:repeat2]
+    wednesday_stat = goal_params[:repeat3]
+    thursday_stat = goal_params[:repeat4]
+    friday_stat = goal_params[:repeat5]
+    saturday_stat = goal_params[:repeat6]
+    sunday_stat = goal_params[:repeat7]
+    month_stat = goal_params[:repeat8]
+    all_stats = [monday_stat, tuesday_stat, wednesday_stat, thursday_stat, friday_stat, saturday_stat, sunday_stat, month_stat]
+    parent_id = goal_params[:parent_id]
+
+    if pick_color == 0
+      background_color = nil
+      border_color = nil
+    end
+
+    if parent_id.empty?
+      parent_id = nil
+    else
+      parent_id = parent_id.to_i
+      parent_goal = Goal.find(parent_id)
+      parent_goal.update_attribute(:has_child, 1)
+      if pick_color == 0
+        background_color = parent_goal.background_color
+        border_color = parent_goal.border_color
       end
     end
+
+    if hardcode_time == 1
+      deadline = nil
+    else
+      starttime = nil
+      endtime = nil
+      time_alloc = goal_params[:timetaken]
+    end
+
+    repeat_stat = nil
+    if repeatable == 1
+      rep_string = ""
+      all_stats.each_with_index do |stat, index|
+        if stat == "1"
+          rep_string += (index + 1).to_s
+        end
+      end
+      repeat_stat = rep_string.to_i
+    end
+
+    @new_goal.assign_attributes({title: title,
+       description: description,
+       deadline: deadline,
+       start: starttime,
+       repeatable: repeat_stat,
+       :end => endtime,
+       parent_id: parent_id,
+       timetaken: time_alloc,
+       background_color: background_color,
+       border_color: border_color
+      })
+    @new_goal.save
+    unless @new_goal.timetaken
+      time_taken = (@new_goal.end.to_time - @new_goal.start.to_time)/60
+      @new_goal.update_attribute(:timetaken, time_taken)
+    end
+    redirect_to goals_path    
+
+    # respond_to do |format|
+    #   if @goal.update(goal_params)
+    #     format.html { redirect_to @post, notice: 'Post was successfully updated.' }
+    #     format.json { head :no_content }
+    #   else
+    #     format.html { render action: 'edit' }
+    #     format.json { render json: @post.errors, status: :unprocessable_entity }
+    #   end
+    # end
   end
 
   def assign
