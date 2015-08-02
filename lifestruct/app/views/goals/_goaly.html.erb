@@ -2,17 +2,19 @@
   <div class="goal">
   <h3> <%= goal.title %>  </h3>
   <p> <%= goal.description %> </p>
-  <% if goal.repeatable %> 
-    <p> <strong> Repeats every </strong> <%= decode_rep_code goal.repeatable %> </p>
-  <% end %>
-  <% if goal.deadline %>
-    <p> <strong>Deadline:</strong> <%= format_datetime goal.deadline %> </p>
-  <% end %>
-  <% if goal.start %>
-    <p> <strong>Start Time:</strong> <%= format_datetime goal.start %> </p>
-  <% end %>
-  <% if goal.end %>
-    <p> <strong>End Time:</strong> <%= format_datetime goal.end %> </p>
+  <% if goal.subgoals.length == 0 %>
+    <% if goal.repeatable %> 
+      <p> <strong> Repeats every </strong> <%= decode_rep_code goal.repeatable %> </p>
+    <% end %>
+    <% if goal.deadline %>
+      <p> <strong>Deadline:</strong> <%= format_datetime goal.deadline %> </p>
+    <% end %>
+    <% if goal.start %>
+      <p> <strong>Start Time:</strong> <%= format_datetime goal.start %> </p>
+    <% end %>
+    <% if goal.end %>
+      <p> <strong>End Time:</strong> <%= format_datetime goal.end %> </p>
+    <% end %>
   <% end %>
   <button type="button" class="btn btn-primary btn-small add-goal-button" data-toggle="modal" data-target="#myModal" id="parent-<%= goal.id %>">
     <i class="icon-plus icon-white"></i> 
